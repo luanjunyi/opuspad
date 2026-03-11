@@ -1,7 +1,10 @@
 import { FileSystemService, FileNode, LoadFileResult } from '../types';
 
+interface MockFileSystemTree {
+  [key: string]: string | ArrayBuffer | MockFileSystemTree;
+}
+
 type MockFileSystemEntry = string | ArrayBuffer | MockFileSystemTree;
-type MockFileSystemTree = Record<string, MockFileSystemEntry>;
 
 export class MockFileSystemService implements FileSystemService {
   private fileSystem: MockFileSystemTree = {

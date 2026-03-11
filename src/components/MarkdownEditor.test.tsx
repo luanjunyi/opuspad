@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownEditor } from './MarkdownEditor';
 import type { ActiveFile } from '../types';
 
+type MockBlock = { type: string; id?: string };
+
 function createDeferred<T>() {
   let resolve!: (value: T) => void;
   let reject!: (error?: unknown) => void;
@@ -31,13 +33,19 @@ function createActiveFile(path: string, content: string): ActiveFile {
   };
 }
 
-function createMockEditor(id: string, parsePromise: Promise<unknown[]>) {
-  const editor = {
+function createMockEditor(id: string, parsePromise: Promise<MockBlock[]>) {
+  const editor: {
+    id: string;
+    document: MockBlock[];
+    tryParseMarkdownToBlocks: ReturnType<typeof vi.fn>;
+    replaceBlocks: ReturnType<typeof vi.fn>;
+    blocksToMarkdownLossy: ReturnType<typeof vi.fn>;
+  } = {
     id,
     document: [{ type: 'doc', id }],
     tryParseMarkdownToBlocks: vi.fn(() => parsePromise),
-    replaceBlocks: vi.fn((document: unknown, blocks: unknown[]) => {
-      editor.document = blocks.length > 0 ? blocks : [document];
+    replaceBlocks: vi.fn((document: MockBlock[], blocks: MockBlock[]) => {
+      editor.document = blocks.length > 0 ? blocks : document;
     }),
     blocksToMarkdownLossy: vi.fn().mockResolvedValue(`serialized:${id}`),
   };
@@ -105,7 +113,7 @@ describe('MarkdownEditor', () => {
 
   it('clears the previous editor while a new markdown file is loading', async () => {
     const firstEditor = createMockEditor('editor-1', Promise.resolve([{ type: 'paragraph' }]));
-    const secondLoad = createDeferred<unknown[]>();
+    const secondLoad = createDeferred<MockBlock[]>();
     const secondEditor = createMockEditor('editor-2', secondLoad.promise);
     blockNoteCreate.mockReturnValueOnce(firstEditor).mockReturnValueOnce(secondEditor);
 
@@ -135,7 +143,7 @@ describe('MarkdownEditor', () => {
   });
 
   it('ignores late editor loads from a previously selected file', async () => {
-    const firstLoad = createDeferred<unknown[]>();
+    const firstLoad = createDeferred<MockBlock[]>();
     const firstEditor = createMockEditor('editor-1', firstLoad.promise);
     const secondEditor = createMockEditor('editor-2', Promise.resolve([{ type: 'paragraph' }]));
     blockNoteCreate.mockReturnValueOnce(firstEditor).mockReturnValueOnce(secondEditor);
