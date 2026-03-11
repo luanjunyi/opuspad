@@ -10,19 +10,25 @@ import { shouldPreventEditorPageScroll } from "../utils/editorKeyboard";
 interface MarkdownEditorProps {
   activeFile: ActiveFile;
   onSave: (content: string) => void;
+  onDirty: () => void;
   onOpenInSourceMode: () => void;
 }
 
-export function MarkdownEditor({ activeFile, onSave, onOpenInSourceMode }: MarkdownEditorProps) {
+export function MarkdownEditor({ activeFile, onSave, onDirty, onOpenInSourceMode }: MarkdownEditorProps) {
   const [editor, setEditor] = useState<BlockNoteEditor | null>(null);
   const latestLoadId = useRef(0);
   const editorRef = useRef<BlockNoteEditor | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onSaveRef = useRef(onSave);
+  const onDirtyRef = useRef(onDirty);
 
   useEffect(() => {
     onSaveRef.current = onSave;
   }, [onSave]);
+
+  useEffect(() => {
+    onDirtyRef.current = onDirty;
+  }, [onDirty]);
 
   useEffect(() => {
     const loadId = ++latestLoadId.current;
@@ -65,6 +71,8 @@ export function MarkdownEditor({ activeFile, onSave, onOpenInSourceMode }: Markd
 
   const handleChange = useCallback(() => {
     if (!editor) return;
+
+    onDirtyRef.current();
 
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);

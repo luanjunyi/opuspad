@@ -1,10 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "Markdown Editor",
-  "version": "1.0.0",
-  "description": "A Chrome Extension that turns the browser into a local workspace editor",
+  "name": "OpusPad",
+  "version": "1.0",
+  "description": "OpusPad: Bridging AI output and human intent, WYSIWYG, private, local only.",
   "action": {
-    "default_title": "Open Editor"
+    "default_title": "Open Editor",
+    "default_icon": {
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "128": "icon128.png"
   },
   "background": {
     "service_worker": "src/background.ts",

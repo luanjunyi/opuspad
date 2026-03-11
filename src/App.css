@@ -331,6 +331,63 @@ button {
   color: var(--muted);
 }
 
+.editor-panel__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.save-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.36)),
+    var(--panel-strong);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.save-indicator__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.42);
+}
+
+.save-indicator--saved {
+  color: var(--accent);
+  border-color: rgba(27, 77, 62, 0.18);
+  background:
+    linear-gradient(180deg, rgba(220, 247, 237, 0.92), rgba(241, 249, 245, 0.75)),
+    var(--panel-strong);
+}
+
+.save-indicator--saving {
+  color: #7d5f18;
+  border-color: rgba(140, 93, 18, 0.22);
+  background:
+    linear-gradient(180deg, rgba(251, 239, 199, 0.92), rgba(255, 248, 231, 0.78)),
+    var(--panel-strong);
+}
+
+.save-indicator--dirty {
+  color: var(--error);
+  border-color: rgba(141, 49, 33, 0.2);
+  background:
+    linear-gradient(180deg, rgba(248, 223, 217, 0.92), rgba(255, 245, 243, 0.78)),
+    var(--panel-strong);
+}
+
 .editor-panel__body {
   min-height: 0;
   flex: 1;
@@ -411,6 +468,10 @@ button {
   .editor-panel__header,
   .editor-warning {
     flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .editor-panel__meta {
     align-items: flex-start;
   }
 

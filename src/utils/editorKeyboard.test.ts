@@ -32,4 +32,14 @@ describe('shouldPreventEditorPageScroll', () => {
 
     expect(shouldPreventEditorPageScroll(chrome, ' ')).toBe(true);
   });
+
+  it('does not block space activation for buttons inside editor chrome', () => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'editor-surface';
+
+    const button = document.createElement('button');
+    wrapper.appendChild(button);
+
+    expect(shouldPreventEditorPageScroll(button, ' ')).toBe(false);
+  });
 });

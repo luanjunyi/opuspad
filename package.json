@@ -1,7 +1,7 @@
 {
-  "name": "md_editor_chrome",
+  "name": "opuspad_chrome",
   "version": "1.0.0",
-  "description": "",
+  "description": "OpusPad: Bridging AI output and human intent, WYSIWYG, private, local only.",
   "main": "index.js",
   "scripts": {
     "dev": "vite",

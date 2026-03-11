@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, createEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
@@ -58,9 +58,10 @@ vi.mock('./components/Sidebar', () => ({
 }));
 
 vi.mock('./components/EditorRouter', () => ({
-  EditorRouter: ({ activeFile, onSave }: any) => (
+  EditorRouter: ({ activeFile, onDirty, onSave }: any) => (
     <div>
       <div data-testid="active-path">{activeFile.node.path}</div>
+      <button onClick={() => onDirty()}>Dirty</button>
       <button onClick={() => onSave(`saved:${activeFile.node.path}`)}>Save</button>
     </div>
   ),
@@ -83,7 +84,8 @@ describe('App', () => {
 
   it('renders headline', () => {
     render(<App />);
-    expect(screen.getByText('Quiet local editing for notes, specs, and source files.')).toBeInTheDocument();
+    expect(screen.getByText('OpusPad')).toBeInTheDocument();
+    expect(screen.getByText('Bridging AI output and human intent, WYSIWYG, private, local only.')).toBeInTheDocument();
   });
 
   it('ignores stale file-load results when a newer selection finishes first', async () => {
@@ -153,5 +155,30 @@ describe('App', () => {
     });
 
     expect(screen.getByTestId('active-path')).toHaveTextContent(betaNode.path);
+  });
+
+  it('shows persistent save state badges for clean and dirty files', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Open Folder' }));
+    await screen.findByRole('button', { name: alphaNode.name });
+    await user.click(screen.getByRole('button', { name: alphaNode.name }));
+
+    await waitFor(() => {
+      expect(screen.getByText('All changes saved')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Dirty' }));
+    expect(screen.getByText('Unsaved changes')).toBeInTheDocument();
+  });
+
+  it('prevents the browser save shortcut', () => {
+    render(<App />);
+
+    const saveEvent = createEvent.keyDown(window, { key: 's', metaKey: true });
+    window.dispatchEvent(saveEvent);
+
+    expect(saveEvent.defaultPrevented).toBe(true);
   });
 });

@@ -13,12 +13,36 @@ export default function App() {
   const [permissionError, setPermissionError] = useState<boolean>(false);
   const latestFileSelectionId = useRef(0);
   const activeFileRef = useRef<ActiveFile | null>(null);
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
-  const saveStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'dirty' | 'saving' | 'saved'>('idle');
+  const editVersionRef = useRef(0);
 
   useEffect(() => {
     activeFileRef.current = activeFile;
   }, [activeFile]);
+
+  useEffect(() => {
+    if (!activeFile || activeFile.state.kind !== 'text') {
+      setSaveStatus('idle');
+      editVersionRef.current = 0;
+      return;
+    }
+
+    setSaveStatus('saved');
+    editVersionRef.current = 0;
+  }, [activeFile?.node.path, activeFile?.state.kind]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   const mountWorkspace = async () => {
     try {
@@ -61,6 +85,7 @@ export default function App() {
   const handleSave = useCallback(async (content: string) => {
     const currentActiveFile = activeFileRef.current;
     if (!currentActiveFile) return;
+    const saveVersion = editVersionRef.current;
 
     const originalPath = currentActiveFile.node.path;
     let fileHandle = currentActiveFile.node.handle as FileSystemFileHandle;
@@ -96,18 +121,37 @@ export default function App() {
         })
       );
 
-      setSaveStatus('saved');
-      if (saveStatusTimeoutRef.current) {
-        clearTimeout(saveStatusTimeoutRef.current);
-      }
-      saveStatusTimeoutRef.current = setTimeout(() => {
-        setSaveStatus('idle');
-      }, 2000);
+      setSaveStatus(saveVersion === editVersionRef.current ? 'saved' : 'dirty');
     } catch (e) {
       console.error('Save failed:', e);
-      setSaveStatus('idle');
+      setSaveStatus('dirty');
     }
   }, []);
+
+  const handleDirty = useCallback(() => {
+    editVersionRef.current += 1;
+    setSaveStatus('dirty');
+  }, []);
+
+  const renderSaveIndicator = () => {
+    if (!activeFile || activeFile.state.kind !== 'text') {
+      return null;
+    }
+
+    const variant = saveStatus === 'idle' ? 'saved' : saveStatus;
+    const label = variant === 'saving'
+      ? 'Saving'
+      : variant === 'dirty'
+        ? 'Unsaved changes'
+        : 'All changes saved';
+
+    return (
+      <span className={`save-indicator save-indicator--${variant}`}>
+        <span className="save-indicator__dot" aria-hidden="true" />
+        <span>{label}</span>
+      </span>
+    );
+  };
 
   const openInSourceMode = useCallback(() => {
     setActiveFile((current) => {
@@ -145,8 +189,8 @@ export default function App() {
         <main className="landing-shell">
           <section className="landing-panel">
             <div className="landing-panel__hero">
-              <h1 className="landing-panel__title">Markdown Editor</h1>
-              <p className="landing-panel__subtitle">Quiet local editing for notes, specs, and source files.</p>
+              <h1 className="landing-panel__title">OpusPad</h1>
+              <p className="landing-panel__subtitle">Bridging AI output and human intent, WYSIWYG, private, local only.</p>
             </div>
             
             <div className="landing-panel__features">
@@ -208,17 +252,19 @@ export default function App() {
                   <div>
                     <p className="editor-panel__eyebrow">
                       {activeFile.state.kind === 'text' ? activeFile.state.editor === 'markdown' ? 'Rich mode' : 'Source mode' : 'Unavailable'}
-                      {saveStatus === 'saved' && <span style={{ marginLeft: '8px', color: 'var(--color-text-muted)' }}>✓ Saved</span>}
-                      {saveStatus === 'saving' && <span style={{ marginLeft: '8px', color: 'var(--color-text-muted)' }}>Saving...</span>}
                     </p>
                     <strong>{activeFile.node.name}</strong>
                   </div>
-                  <span className="editor-panel__path">{rootHandle?.name}/{activeFile.node.path}</span>
+                  <div className="editor-panel__meta">
+                    {renderSaveIndicator()}
+                    <span className="editor-panel__path">{rootHandle?.name}/{activeFile.node.path}</span>
+                  </div>
                 </header>
                 <div className="editor-panel__body">
                   <EditorRouter
                     activeFile={activeFile}
                     onSave={handleSave}
+                    onDirty={handleDirty}
                     onOpenInSourceMode={openInSourceMode}
                     onOpenInRichMode={openInRichMode}
                   />

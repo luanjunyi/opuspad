@@ -1,6 +1,6 @@
-# Markdown Editor Chrome Extension
+# OpusPad
 
-A Chrome Extension that transforms your browser into a robust local file system editor. It features a dual-editor architecture: a Notion-like WYSIWYG block editor for Markdown files, and a code editor for plain text and data files. 
+OpusPad is a Chrome Extension that transforms your browser into a robust local file system editor, bridging the gap between humans and AI agents. It features a dual-editor architecture: a Notion-like WYSIWYG block editor for Markdown files (designed as the perfect medium for human-AI collaboration), and a code editor for plain text and data files. 
 
 ## Features
 

@@ -10,10 +10,11 @@ import { getSourceLanguage } from '../utils/sourceLanguage';
 interface TextEditorProps {
   activeFile: ActiveFile;
   onSave: (content: string) => void;
+  onDirty: () => void;
   onOpenInRichMode: () => void;
 }
 
-export function TextEditor({ activeFile, onSave, onOpenInRichMode }: TextEditorProps) {
+export function TextEditor({ activeFile, onSave, onDirty, onOpenInRichMode }: TextEditorProps) {
   const fileState = activeFile.state;
   
   if (fileState.kind === 'error') {
@@ -29,19 +30,34 @@ export function TextEditor({ activeFile, onSave, onOpenInRichMode }: TextEditorP
 
   const [content, setContent] = useState(fileState.content);
   const onSaveRef = useRef(onSave);
+  const onDirtyRef = useRef(onDirty);
   const latestContentRef = useRef(fileState.content);
   const savedContentRef = useRef(fileState.content);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previousPathRef = useRef(fileState.path);
 
   useEffect(() => {
     onSaveRef.current = onSave;
   }, [onSave]);
 
-  // Sync content if file changes
   useEffect(() => {
-    setContent(fileState.content);
-    latestContentRef.current = fileState.content;
+    onDirtyRef.current = onDirty;
+  }, [onDirty]);
+
+  useEffect(() => {
     savedContentRef.current = fileState.content;
+    const pathChanged = previousPathRef.current !== fileState.path;
+
+    if (pathChanged) {
+      previousPathRef.current = fileState.path;
+      latestContentRef.current = fileState.content;
+      setContent(fileState.content);
+      return;
+    }
+
+    if (latestContentRef.current === fileState.content) {
+      setContent(fileState.content);
+    }
   }, [fileState.path, fileState.content]);
 
   // Debounced save
@@ -96,6 +112,7 @@ export function TextEditor({ activeFile, onSave, onOpenInRichMode }: TextEditorP
 
   const onChange = useCallback((val: string) => {
     latestContentRef.current = val;
+    onDirtyRef.current();
     setContent(val);
   }, []);
 

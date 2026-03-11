@@ -26,9 +26,8 @@ cd ..
 
 You will need several visual assets and descriptions for your store page:
 
-* **Extension Name:** Markdown Editor (or your chosen brand name)
-
-* **Short Description:** (Max 132 characters) "Edit local Markdown files with a WYSIWYG block editor directly in your browser."
+* **Extension Name:** "OpusPad"
+* **Short Description:** (Max 132 characters) "Bridging AI output and human intent, WYSIWYG, private, local only."
 
 * **Detailed Description:** A full explanation of features (similar to the README).
 
