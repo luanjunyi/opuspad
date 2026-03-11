@@ -1,0 +1,56 @@
+{
+  "name": "md_editor_chrome",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luanjunyi/md-editor-in-chrome.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/luanjunyi/md-editor-in-chrome/issues"
+  },
+  "homepage": "https://github.com/luanjunyi/md-editor-in-chrome#readme",
+  "dependencies": {
+    "@blocknote/core": "^0.47.1",
+    "@blocknote/mantine": "^0.47.1",
+    "@blocknote/react": "^0.47.1",
+    "@codemirror/lang-javascript": "^6.2.5",
+    "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/lang-markdown": "^6.5.0",
+    "@mantine/core": "^8.3.16",
+    "@mantine/hooks": "^8.3.16",
+    "@uiw/react-codemirror": "^4.25.8",
+    "codemirror": "^6.0.2",
+    "lucide-react": "^0.577.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.3.0",
+    "@playwright/test": "^1.58.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/chrome": "^0.1.37",
+    "@types/node": "^25.4.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/wicg-file-system-access": "^2023.10.7",
+    "@vitejs/plugin-react": "^5.1.4",
+    "jsdom": "^28.1.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
+  }
+}

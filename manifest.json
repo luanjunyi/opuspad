@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Markdown Editor",
+  "version": "1.0.0",
+  "description": "A Chrome Extension that turns the browser into a local workspace editor",
+  "action": {
+    "default_title": "Open Editor"
+  },
+  "background": {
+    "service_worker": "src/background.ts",
+    "type": "module"
+  },
+  "permissions": []
+}
