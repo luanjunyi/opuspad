@@ -5,6 +5,7 @@ import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 
 import { ActiveFile } from "../types";
+import { shouldPreventEditorPageScroll } from "../utils/editorKeyboard";
 
 interface MarkdownEditorProps {
   activeFile: ActiveFile;
@@ -17,6 +18,11 @@ export function MarkdownEditor({ activeFile, onSave, onOpenInSourceMode }: Markd
   const latestLoadId = useRef(0);
   const editorRef = useRef<BlockNoteEditor | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onSaveRef = useRef(onSave);
+
+  useEffect(() => {
+    onSaveRef.current = onSave;
+  }, [onSave]);
 
   useEffect(() => {
     const loadId = ++latestLoadId.current;
@@ -48,14 +54,14 @@ export function MarkdownEditor({ activeFile, onSave, onOpenInSourceMode }: Markd
         clearTimeout(saveTimeoutRef.current);
         if (editorRef.current) {
           void Promise.resolve(editorRef.current.blocksToMarkdownLossy(editorRef.current.document)).then((markdown) => {
-            onSave(markdown);
+            onSaveRef.current(markdown);
           });
         }
         saveTimeoutRef.current = null;
       }
       editorRef.current = null;
     };
-  }, [activeFile.node.path, onSave]); // Re-load if path changes
+  }, [activeFile.node.path]); // Re-load if path changes
 
   const handleChange = useCallback(() => {
     if (!editor) return;
@@ -67,17 +73,23 @@ export function MarkdownEditor({ activeFile, onSave, onOpenInSourceMode }: Markd
     const currentEditor = editor;
     saveTimeoutRef.current = setTimeout(async () => {
       const markdown = await Promise.resolve(currentEditor.blocksToMarkdownLossy(currentEditor.document));
-      onSave(markdown);
+      onSaveRef.current(markdown);
       saveTimeoutRef.current = null;
     }, 500);
-  }, [editor, onSave]);
+  }, [editor]);
+
+  const handleKeyDownCapture = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (shouldPreventEditorPageScroll(event.target, event.key)) {
+      event.preventDefault();
+    }
+  }, []);
 
   if (!editor) {
     return <div>Loading editor...</div>;
   }
 
   return (
-    <div className="editor-surface editor-surface--markdown">
+    <div className="editor-surface editor-surface--markdown" onKeyDownCapture={handleKeyDownCapture}>
       {activeFile.state.kind === 'text' && activeFile.state.warning && (
         <div className="editor-warning">
           <div>

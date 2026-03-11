@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { getFileSystemService } from './services';
 import { FileNode, ActiveFile } from './types';
 import { Sidebar } from './components/Sidebar';
@@ -11,6 +11,11 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [permissionError, setPermissionError] = useState<boolean>(false);
   const latestFileSelectionId = useRef(0);
+  const activeFileRef = useRef<ActiveFile | null>(null);
+
+  useEffect(() => {
+    activeFileRef.current = activeFile;
+  }, [activeFile]);
 
   const mountWorkspace = async () => {
     try {
@@ -50,11 +55,12 @@ export default function App() {
     });
   };
 
-  const handleSave = async (content: string) => {
-    if (!activeFile || !activeFile.node.handle) return;
+  const handleSave = useCallback(async (content: string) => {
+    const currentActiveFile = activeFileRef.current;
+    if (!currentActiveFile || !currentActiveFile.node.handle) return;
 
-    const savePath = activeFile.node.path;
-    const fileHandle = activeFile.node.handle as FileSystemFileHandle;
+    const savePath = currentActiveFile.node.path;
+    const fileHandle = currentActiveFile.node.handle as FileSystemFileHandle;
     try {
       const fsService = getFileSystemService();
       await fsService.writeFile(fileHandle, content);
@@ -76,9 +82,9 @@ export default function App() {
       console.error('Save failed:', e);
       // Could show a toast notification here
     }
-  };
+  }, []);
 
-  const openInSourceMode = () => {
+  const openInSourceMode = useCallback(() => {
     setActiveFile((current) => {
       if (!current || current.state.kind !== 'text') return current;
       return {
@@ -90,9 +96,9 @@ export default function App() {
         },
       };
     });
-  };
+  }, []);
 
-  const openInRichMode = () => {
+  const openInRichMode = useCallback(() => {
     setActiveFile((current) => {
       if (!current || current.state.kind !== 'text') return current;
       return {
@@ -104,7 +110,7 @@ export default function App() {
         },
       };
     });
-  };
+  }, []);
 
   const isMock = new URLSearchParams(window.location.search).get('fs') === 'mock';
 

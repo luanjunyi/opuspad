@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, createEvent, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownEditor } from './MarkdownEditor';
 import type { ActiveFile } from '../types';
@@ -64,9 +64,14 @@ vi.mock('@blocknote/core', () => ({
 
 vi.mock('@blocknote/mantine', () => ({
   BlockNoteView: ({ editor, onChange }: any) => (
-    <button data-testid="blocknote-view" data-editor-id={editor.id} onClick={() => onChange()}>
-      {editor.id}
-    </button>
+    <div>
+      <button data-testid="blocknote-view" data-editor-id={editor.id} onClick={() => onChange()}>
+        {editor.id}
+      </button>
+      <div data-testid="blocknote-content" contentEditable suppressContentEditableWarning>
+        editor-content-{editor.id}
+      </div>
+    </div>
   ),
 }));
 
@@ -204,5 +209,55 @@ describe('MarkdownEditor', () => {
 
     expect(screen.getByTestId('blocknote-view')).toHaveTextContent('editor-2');
     expect(screen.queryByText('editor-1')).not.toBeInTheDocument();
+  });
+
+  it('does not recreate the editor when only the save callback changes', async () => {
+    const editor = createMockEditor('editor-1', Promise.resolve([{ type: 'paragraph' }]));
+    blockNoteCreate.mockReturnValue(editor);
+
+    const { rerender } = render(
+      <MarkdownEditor
+        activeFile={createActiveFile('notes.md', '# hello')}
+        onSave={vi.fn()}
+        onOpenInSourceMode={vi.fn()}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('blocknote-view')).toHaveTextContent('editor-1');
+    });
+
+    rerender(
+      <MarkdownEditor
+        activeFile={createActiveFile('notes.md', '# hello')}
+        onSave={vi.fn()}
+        onOpenInSourceMode={vi.fn()}
+      />
+    );
+
+    expect(blockNoteCreate).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('blocknote-view')).toHaveTextContent('editor-1');
+  });
+
+  it('prevents page scroll when pressing space inside the rich editor content', async () => {
+    const editor = createMockEditor('editor-1', Promise.resolve([{ type: 'paragraph' }]));
+    blockNoteCreate.mockReturnValue(editor);
+
+    render(
+      <MarkdownEditor
+        activeFile={createActiveFile('notes.md', '# hello')}
+        onSave={vi.fn()}
+        onOpenInSourceMode={vi.fn()}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('blocknote-content')).toBeInTheDocument();
+    });
+
+    const spaceEvent = createEvent.keyDown(screen.getByTestId('blocknote-content'), { key: ' ' });
+    fireEvent(screen.getByTestId('blocknote-content'), spaceEvent);
+
+    expect(spaceEvent.defaultPrevented).toBe(true);
   });
 });
