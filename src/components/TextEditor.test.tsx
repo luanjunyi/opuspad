@@ -76,13 +76,13 @@ describe('TextEditor', () => {
     expect(onSave).toHaveBeenCalledWith('hello world');
   });
 
-  it('prevents page scroll when pressing space inside the source editor content', () => {
+  it('keeps space input working inside the source editor content', () => {
     render(<TextEditor activeFile={createActiveFile('notes.md', 'hello')} onSave={vi.fn()} onOpenInRichMode={vi.fn()} />);
 
     const spaceEvent = createEvent.keyDown(screen.getByTestId('code-editor'), { key: ' ' });
     fireEvent(screen.getByTestId('code-editor'), spaceEvent);
 
-    expect(spaceEvent.defaultPrevented).toBe(true);
+    expect(spaceEvent.defaultPrevented).toBe(false);
   });
 
   it('classifies source files for syntax highlighting', () => {

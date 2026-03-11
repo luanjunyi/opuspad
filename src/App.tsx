@@ -3,6 +3,7 @@ import { getFileSystemService } from './services';
 import { FileNode, ActiveFile } from './types';
 import { Sidebar } from './components/Sidebar';
 import { EditorRouter } from './components/EditorRouter';
+import { applySavedTextFileState } from './utils/activeFileSave';
 
 export default function App() {
   const [rootHandle, setRootHandle] = useState<FileSystemDirectoryHandle | null>(null);
@@ -86,25 +87,14 @@ export default function App() {
       const fsService = getFileSystemService();
       await fsService.writeFile(fileHandle, content);
 
-      setActiveFile((current) => {
-        if (!current || current.node.path !== originalPath || current.state.kind !== 'text') {
-          return current;
-        }
-
-        return {
-          ...current,
-          node: {
-            ...current.node,
-            handle: fileHandle,
-            path: savePath,
-            name: fileHandle.name
-          },
-          state: {
-            ...current.state,
-            content,
-          },
-        };
-      });
+      setActiveFile((current) =>
+        applySavedTextFileState(current, {
+          content,
+          fileHandle,
+          originalPath,
+          savePath,
+        })
+      );
 
       setSaveStatus('saved');
       if (saveStatusTimeoutRef.current) {

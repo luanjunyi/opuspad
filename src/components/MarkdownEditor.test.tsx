@@ -239,7 +239,7 @@ describe('MarkdownEditor', () => {
     expect(screen.getByTestId('blocknote-view')).toHaveTextContent('editor-1');
   });
 
-  it('prevents page scroll when pressing space inside the rich editor content', async () => {
+  it('keeps space input working inside the rich editor content', async () => {
     const editor = createMockEditor('editor-1', Promise.resolve([{ type: 'paragraph' }]));
     blockNoteCreate.mockReturnValue(editor);
 
@@ -258,6 +258,6 @@ describe('MarkdownEditor', () => {
     const spaceEvent = createEvent.keyDown(screen.getByTestId('blocknote-content'), { key: ' ' });
     fireEvent(screen.getByTestId('blocknote-content'), spaceEvent);
 
-    expect(spaceEvent.defaultPrevented).toBe(true);
+    expect(spaceEvent.defaultPrevented).toBe(false);
   });
 });

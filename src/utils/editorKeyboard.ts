@@ -8,13 +8,13 @@ export function shouldPreventEditorPageScroll(target: EventTarget | null, key: s
   }
 
   const editableAncestor = target.closest('[contenteditable="true"], textarea, input, .cm-content');
-  if (!editableAncestor) {
+  if (editableAncestor instanceof HTMLInputElement) {
+    return !isTextInput(editableAncestor);
+  }
+
+  if (editableAncestor) {
     return false;
   }
 
-  if (editableAncestor instanceof HTMLInputElement) {
-    return isTextInput(editableAncestor);
-  }
-
-  return true;
+  return target.closest('.editor-surface') !== null;
 }
