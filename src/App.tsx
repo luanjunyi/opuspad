@@ -12,6 +12,8 @@ export default function App() {
   const [permissionError, setPermissionError] = useState<boolean>(false);
   const latestFileSelectionId = useRef(0);
   const activeFileRef = useRef<ActiveFile | null>(null);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const saveStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     activeFileRef.current = activeFile;
@@ -57,30 +59,63 @@ export default function App() {
 
   const handleSave = useCallback(async (content: string) => {
     const currentActiveFile = activeFileRef.current;
-    if (!currentActiveFile || !currentActiveFile.node.handle) return;
+    if (!currentActiveFile) return;
 
-    const savePath = currentActiveFile.node.path;
-    const fileHandle = currentActiveFile.node.handle as FileSystemFileHandle;
+    const originalPath = currentActiveFile.node.path;
+    let fileHandle = currentActiveFile.node.handle as FileSystemFileHandle;
+    let savePath = originalPath;
+
+    if (!fileHandle) {
+      if (!('showSaveFilePicker' in window)) return;
+      try {
+        fileHandle = await (window as any).showSaveFilePicker({
+          suggestedName: currentActiveFile.node.name,
+          types: [{
+            description: 'Text File',
+            accept: { 'text/plain': ['.txt', '.md', '.markdown'] }
+          }]
+        });
+        savePath = fileHandle.name;
+      } catch (e) {
+        return;
+      }
+    }
+
     try {
+      setSaveStatus('saving');
       const fsService = getFileSystemService();
       await fsService.writeFile(fileHandle, content);
 
       setActiveFile((current) => {
-        if (!current || current.node.path !== savePath || current.state.kind !== 'text') {
+        if (!current || current.node.path !== originalPath || current.state.kind !== 'text') {
           return current;
         }
 
         return {
           ...current,
+          node: {
+            ...current.node,
+            handle: fileHandle,
+            path: savePath,
+            name: fileHandle.name
+          },
           state: {
             ...current.state,
             content,
           },
         };
       });
+
+      setSaveStatus('saved');
+      if (saveStatusTimeoutRef.current) {
+        clearTimeout(saveStatusTimeoutRef.current);
+      }
+      saveStatusTimeoutRef.current = setTimeout(() => {
+        setSaveStatus('idle');
+      }, 2000);
     } catch (e) {
       console.error('Save failed:', e);
-      // Could show a toast notification here
+      setSaveStatus('idle');
     }
   }, []);
 
@@ -119,14 +154,48 @@ export default function App() {
       {!rootHandle ? (
         <main className="landing-shell">
           <section className="landing-panel">
-            <p className="landing-panel__eyebrow">Markdown editor chrome</p>
-            <h1>Quiet local editing for notes, specs, and source files.</h1>
-            <p className="landing-panel__copy">
-              Open a folder, move between rich and source editing, and keep exact Markdown formatting visible when fidelity matters.
-            </p>
-            <button className="primary-button" onClick={mountWorkspace} type="button">
-              {isMock ? 'Open Fixture Workspace' : 'Open Folder'}
-            </button>
+            <div className="landing-panel__hero">
+              <h1 className="landing-panel__title">Markdown Editor</h1>
+              <p className="landing-panel__subtitle">Quiet local editing for notes, specs, and source files.</p>
+            </div>
+            
+            <div className="landing-panel__features">
+              <div className="feature-item">
+                <span className="feature-item__icon">🔒</span>
+                <div className="feature-item__content">
+                  <h3>Local & Secure</h3>
+                  <p>Read and write directly to your file system. No cloud, no data collection.</p>
+                </div>
+              </div>
+              <div className="feature-item">
+                <span className="feature-item__icon">✨</span>
+                <div className="feature-item__content">
+                  <h3>Markdown First</h3>
+                  <p>Highly optimized WYSIWYG experience tailored specifically for markdown files.</p>
+                </div>
+              </div>
+              <div className="feature-item">
+                <span className="feature-item__icon">🌗</span>
+                <div className="feature-item__content">
+                  <h3>Dual Mode</h3>
+                  <p>Seamlessly switch between rich visual editing and precise source mode.</p>
+                </div>
+              </div>
+              <div className="feature-item">
+                <span className="feature-item__icon">🎨</span>
+                <div className="feature-item__content">
+                  <h3>Syntax Highlights</h3>
+                  <p>Full support and highlighting for various code blocks and other text files.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="landing-panel__action">
+              <button className="primary-button landing-panel__button" onClick={mountWorkspace} type="button">
+                {isMock ? 'Open Fixture Workspace' : 'Open Folder'}
+              </button>
+            </div>
+
             {(error || permissionError) && (
               <div className="landing-panel__error">
                 {error && <p>{error}</p>}
@@ -147,10 +216,14 @@ export default function App() {
               <div className="editor-panel">
                 <header className="editor-panel__header">
                   <div>
-                    <p className="editor-panel__eyebrow">{activeFile.state.kind === 'text' ? activeFile.state.editor === 'markdown' ? 'Rich mode' : 'Source mode' : 'Unavailable'}</p>
+                    <p className="editor-panel__eyebrow">
+                      {activeFile.state.kind === 'text' ? activeFile.state.editor === 'markdown' ? 'Rich mode' : 'Source mode' : 'Unavailable'}
+                      {saveStatus === 'saved' && <span style={{ marginLeft: '8px', color: 'var(--color-text-muted)' }}>✓ Saved</span>}
+                      {saveStatus === 'saving' && <span style={{ marginLeft: '8px', color: 'var(--color-text-muted)' }}>Saving...</span>}
+                    </p>
                     <strong>{activeFile.node.name}</strong>
                   </div>
-                  <span className="editor-panel__path">{activeFile.node.path}</span>
+                  <span className="editor-panel__path">{rootHandle?.name}/{activeFile.node.path}</span>
                 </header>
                 <div className="editor-panel__body">
                   <EditorRouter

@@ -71,12 +71,96 @@ button {
 }
 
 .landing-panel {
-  max-width: 720px;
-  padding: 56px;
+  max-width: 800px;
+  padding: 64px 72px;
   border-radius: 32px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.07), 0 4px 12px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(24px);
 }
 
-.landing-panel h1,
+.landing-panel__hero {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.landing-panel__title {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  margin: 0 0 16px;
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  line-height: 1.05;
+  color: var(--ink);
+}
+
+.landing-panel__subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  line-height: 1.5;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.landing-panel__features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  margin-bottom: 56px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.feature-item__icon {
+  font-size: 1.5rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.feature-item__content h3 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.feature-item__content p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.landing-panel__action {
+  text-align: center;
+}
+
+.landing-panel__button {
+  padding: 16px 36px;
+  font-size: 1.1rem;
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.landing-panel__button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+
 .empty-state h2,
 .sidebar-shell__header h2 {
   font-family: "Instrument Serif", serif;
@@ -331,7 +415,12 @@ button {
   }
 
   .landing-panel {
-    padding: 32px;
+    padding: 32px 24px;
     border-radius: 24px;
+  }
+
+  .landing-panel__features {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 }

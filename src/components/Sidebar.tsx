@@ -94,7 +94,7 @@ export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: Sideb
     <aside className="sidebar-shell">
       <div className="sidebar-shell__header">
         <p className="sidebar-shell__eyebrow">Workspace</p>
-        <h2>Local files</h2>
+        <h2>{rootHandle ? rootHandle.name : 'Local files'}</h2>
       </div>
       {nodes.map(n => renderNode(n))}
     </aside>
