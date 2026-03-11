@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { getFileSystemService } from './services';
 import { FileNode, ActiveFile } from './types';
 import { Sidebar } from './components/Sidebar';
@@ -10,6 +10,7 @@ export default function App() {
   const [activeFile, setActiveFile] = useState<ActiveFile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [permissionError, setPermissionError] = useState<boolean>(false);
+  const latestFileSelectionId = useRef(0);
 
   const mountWorkspace = async () => {
     try {
@@ -37,28 +38,40 @@ export default function App() {
 
   const handleFileSelect = async (node: FileNode) => {
     if (node.kind !== 'file' || !node.handle) return;
-    
+
+    const selectionId = ++latestFileSelectionId.current;
     const fsService = getFileSystemService();
     const state = await fsService.readEditableFile(node.handle as FileSystemFileHandle, node.path);
-    setActiveFile({ node, state });
+    setActiveFile((current) => {
+      if (selectionId !== latestFileSelectionId.current) {
+        return current;
+      }
+      return { node, state };
+    });
   };
 
   const handleSave = async (content: string) => {
     if (!activeFile || !activeFile.node.handle) return;
+
+    const savePath = activeFile.node.path;
+    const fileHandle = activeFile.node.handle as FileSystemFileHandle;
     try {
       const fsService = getFileSystemService();
-      await fsService.writeFile(activeFile.node.handle as FileSystemFileHandle, content);
-      
-      // Update local state to prevent re-saving
-      if (activeFile.state.kind === 'text') {
-         setActiveFile({
-           ...activeFile,
-           state: {
-             ...activeFile.state,
-             content
-           }
-         });
-      }
+      await fsService.writeFile(fileHandle, content);
+
+      setActiveFile((current) => {
+        if (!current || current.node.path !== savePath || current.state.kind !== 'text') {
+          return current;
+        }
+
+        return {
+          ...current,
+          state: {
+            ...current.state,
+            content,
+          },
+        };
+      });
     } catch (e) {
       console.error('Save failed:', e);
       // Could show a toast notification here

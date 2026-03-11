@@ -1,7 +1,10 @@
 import { FileSystemService, FileNode, LoadFileResult } from '../types';
 
+type MockFileSystemEntry = string | ArrayBuffer | MockFileSystemTree;
+type MockFileSystemTree = Record<string, MockFileSystemEntry>;
+
 export class MockFileSystemService implements FileSystemService {
-  private fileSystem: Record<string, string | Record<string, any>> = {
+  private fileSystem: MockFileSystemTree = {
     'notes.md': '# Hello World\n\nThis is a mock note.',
     'notes-with-table.md': '| Header 1 | Header 2 |\n|----------|----------|\n| Cell 1   | Cell 2   |',
     'data.json': '{"hello": "world"}',
@@ -11,15 +14,41 @@ export class MockFileSystemService implements FileSystemService {
     }
   };
 
-  private async getByPath(pathParts: string[]): Promise<any> {
-    let current: any = this.fileSystem;
+  private isDirectoryEntry(entry: MockFileSystemEntry): entry is MockFileSystemTree {
+    return typeof entry === 'object' && entry !== null && !(entry instanceof ArrayBuffer);
+  }
+
+  private async getByPath(pathParts: string[]): Promise<MockFileSystemEntry> {
+    let current: MockFileSystemEntry = this.fileSystem;
     for (const part of pathParts) {
-      if (current[part] === undefined) {
+      if (!this.isDirectoryEntry(current) || current[part] === undefined) {
         throw new Error('Not found');
       }
       current = current[part];
     }
     return current;
+  }
+
+  private async setByPath(pathParts: string[], content: string): Promise<void> {
+    if (pathParts.length === 0) {
+      throw new Error('Invalid path');
+    }
+
+    let current: MockFileSystemTree = this.fileSystem;
+    for (const part of pathParts.slice(0, -1)) {
+      const next = current[part];
+      if (!this.isDirectoryEntry(next)) {
+        throw new Error('Parent directory not found');
+      }
+      current = next;
+    }
+
+    const leaf = pathParts[pathParts.length - 1];
+    if (current[leaf] === undefined) {
+      throw new Error('Not found');
+    }
+
+    current[leaf] = content;
   }
 
   async mountWorkspace(): Promise<FileSystemDirectoryHandle | null> {
@@ -46,18 +75,19 @@ export class MockFileSystemService implements FileSystemService {
       return [];
     }
 
-    if (typeof current !== 'object' || current instanceof ArrayBuffer) {
+    if (!this.isDirectoryEntry(current)) {
       return [];
     }
 
     const nodes: FileNode[] = [];
     for (const [name, value] of Object.entries(current)) {
-      const isDir = typeof value === 'object' && !(value instanceof ArrayBuffer);
+      const isDir = this.isDirectoryEntry(value);
+      const path = currentPath ? `${currentPath}/${name}` : name;
       nodes.push({
         name,
         kind: isDir ? 'directory' : 'file',
-        path: currentPath ? `${currentPath}/${name}` : name,
-        handle: { kind: isDir ? 'directory' : 'file', name } as any,
+        path,
+        handle: { kind: isDir ? 'directory' : 'file', name, path } as any,
         childrenLoaded: false,
       });
     }
@@ -72,12 +102,12 @@ export class MockFileSystemService implements FileSystemService {
     try {
       const parts = path.split('/');
       const content = await this.getByPath(parts);
-      
-      if (content instanceof ArrayBuffer || content?.buffer) {
+
+      if (content instanceof ArrayBuffer) {
          return { kind: 'error', path, reason: 'binary', message: 'Binary files cannot be edited' };
       }
 
-      if (typeof content !== 'string') {
+      if (this.isDirectoryEntry(content) || typeof content !== 'string') {
         throw new Error('Not a file');
       }
 
@@ -103,11 +133,8 @@ export class MockFileSystemService implements FileSystemService {
   }
 
   async writeFile(fileHandle: FileSystemFileHandle, content: string): Promise<void> {
-    // In a real mock, we would need the full path. Since fileHandle doesn't easily store it here,
-    // we assume the path was stashed on the handle in this mock implementation.
-    const path = (fileHandle as any).name;
-    // VERY simple mock write, just ignoring path hierarchy for now if not implemented.
-    this.fileSystem[path] = content;
+    const path = (fileHandle as any).path ?? (fileHandle as any).name;
+    await this.setByPath(path.split('/'), content);
   }
 }
 
