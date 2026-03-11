@@ -85,7 +85,7 @@ describe('MarkdownEditor', () => {
     blockNoteCreate.mockReturnValue(editor);
     const onSave = vi.fn();
 
-    render(<MarkdownEditor activeFile={createActiveFile('notes.md', '# hello')} onSave={onSave} />);
+    render(<MarkdownEditor activeFile={createActiveFile('notes.md', '# hello')} onSave={onSave} onOpenInSourceMode={vi.fn()} />);
 
     await act(async () => {
       await Promise.resolve();
@@ -111,6 +111,37 @@ describe('MarkdownEditor', () => {
     expect(onSave).toHaveBeenCalledWith('serialized:editor-1');
   });
 
+  it('flushes pending markdown changes when the editor unmounts before debounce completes', async () => {
+    vi.useFakeTimers();
+    const editor = createMockEditor('editor-1', Promise.resolve([{ type: 'paragraph' }]));
+    blockNoteCreate.mockReturnValue(editor);
+    const onSave = vi.fn();
+
+    const { unmount } = render(
+      <MarkdownEditor
+        activeFile={createActiveFile('notes.md', '# hello')}
+        onSave={onSave}
+        onOpenInSourceMode={vi.fn()}
+      />
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    fireEvent.click(screen.getByTestId('blocknote-view'));
+    expect(onSave).not.toHaveBeenCalled();
+
+    unmount();
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    expect(onSave).toHaveBeenCalledWith('serialized:editor-1');
+  });
+
   it('clears the previous editor while a new markdown file is loading', async () => {
     const firstEditor = createMockEditor('editor-1', Promise.resolve([{ type: 'paragraph' }]));
     const secondLoad = createDeferred<MockBlock[]>();
@@ -118,14 +149,18 @@ describe('MarkdownEditor', () => {
     blockNoteCreate.mockReturnValueOnce(firstEditor).mockReturnValueOnce(secondEditor);
 
     const { rerender } = render(
-      <MarkdownEditor activeFile={createActiveFile('first.md', '# first')} onSave={vi.fn()} />
+      <MarkdownEditor
+        activeFile={createActiveFile('first.md', '# first')}
+        onSave={vi.fn()}
+        onOpenInSourceMode={vi.fn()}
+      />
     );
 
     await waitFor(() => {
       expect(screen.getByTestId('blocknote-view')).toHaveTextContent('editor-1');
     });
 
-    rerender(<MarkdownEditor activeFile={createActiveFile('second.md', '# second')} onSave={vi.fn()} />);
+    rerender(<MarkdownEditor activeFile={createActiveFile('second.md', '# second')} onSave={vi.fn()} onOpenInSourceMode={vi.fn()} />);
 
     await waitFor(() => {
       expect(screen.getByText('Loading editor...')).toBeInTheDocument();
@@ -149,10 +184,14 @@ describe('MarkdownEditor', () => {
     blockNoteCreate.mockReturnValueOnce(firstEditor).mockReturnValueOnce(secondEditor);
 
     const { rerender } = render(
-      <MarkdownEditor activeFile={createActiveFile('first.md', '# first')} onSave={vi.fn()} />
+      <MarkdownEditor
+        activeFile={createActiveFile('first.md', '# first')}
+        onSave={vi.fn()}
+        onOpenInSourceMode={vi.fn()}
+      />
     );
 
-    rerender(<MarkdownEditor activeFile={createActiveFile('second.md', '# second')} onSave={vi.fn()} />);
+    rerender(<MarkdownEditor activeFile={createActiveFile('second.md', '# second')} onSave={vi.fn()} onOpenInSourceMode={vi.fn()} />);
 
     await waitFor(() => {
       expect(screen.getByTestId('blocknote-view')).toHaveTextContent('editor-2');

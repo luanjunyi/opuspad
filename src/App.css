@@ -1,0 +1,337 @@
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap");
+
+:root {
+  color-scheme: light;
+  font-family: "Manrope", sans-serif;
+  --bg: #f4f1ea;
+  --bg-wash: rgba(255, 255, 255, 0.56);
+  --panel: rgba(255, 252, 247, 0.86);
+  --panel-strong: rgba(255, 253, 250, 0.95);
+  --line: rgba(31, 29, 27, 0.12);
+  --line-strong: rgba(31, 29, 27, 0.22);
+  --ink: #1f1d1b;
+  --muted: #6a655d;
+  --accent: #1b4d3e;
+  --accent-soft: rgba(27, 77, 62, 0.12);
+  --warning: #8c5d12;
+  --warning-bg: rgba(181, 141, 44, 0.12);
+  --error: #8d3121;
+  --error-bg: rgba(141, 49, 33, 0.1);
+  --shadow: 0 20px 60px rgba(37, 32, 26, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(27, 77, 62, 0.08), transparent 24rem),
+    radial-gradient(circle at bottom right, rgba(163, 133, 95, 0.12), transparent 30rem),
+    var(--bg);
+  color: var(--ink);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.18;
+}
+
+button {
+  font: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.landing-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+
+.landing-panel,
+.editor-panel,
+.sidebar-shell {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
+}
+
+.landing-panel {
+  max-width: 720px;
+  padding: 56px;
+  border-radius: 32px;
+}
+
+.landing-panel h1,
+.empty-state h2,
+.sidebar-shell__header h2 {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+
+.landing-panel h1 {
+  margin: 0 0 18px;
+  font-size: clamp(2.8rem, 7vw, 5.2rem);
+  line-height: 0.92;
+  max-width: 10ch;
+}
+
+.landing-panel__eyebrow,
+.editor-panel__eyebrow,
+.empty-state__eyebrow,
+.sidebar-shell__eyebrow,
+.editor-warning__eyebrow,
+.unsupported-file__eyebrow {
+  margin: 0 0 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.landing-panel__copy,
+.empty-state p,
+.editor-warning__text,
+.unsupported-file p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.primary-button,
+.ghost-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 13px 20px;
+  cursor: pointer;
+  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+
+.primary-button {
+  margin-top: 28px;
+  background: var(--ink);
+  color: #f7f4ef;
+}
+
+.primary-button:hover,
+.ghost-button:hover {
+  transform: translateY(-1px);
+}
+
+.ghost-button {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.landing-panel__error,
+.unsupported-file {
+  margin-top: 20px;
+  border-radius: 20px;
+  padding: 18px 20px;
+  border: 1px solid rgba(141, 49, 33, 0.22);
+  background: var(--error-bg);
+}
+
+.workspace-shell {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  min-height: 100vh;
+  gap: 18px;
+  padding: 18px;
+}
+
+.sidebar-shell {
+  border-radius: 28px;
+  overflow: auto;
+  padding: 16px 0 18px;
+}
+
+.sidebar-shell__header {
+  padding: 6px 18px 16px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+
+.sidebar-shell__header h2 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 0 16px 0 0;
+  border-radius: 14px;
+  margin: 2px 10px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.sidebar-item__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.94rem;
+}
+
+.sidebar-item__spacer {
+  width: 14px;
+  flex: 0 0 14px;
+}
+
+.sidebar-item__loading {
+  margin-left: auto;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.workspace-main {
+  min-width: 0;
+}
+
+.editor-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 36px);
+  border-radius: 32px;
+  overflow: hidden;
+}
+
+.editor-panel__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 28px 20px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255,255,255,0.52), rgba(255,255,255,0.2));
+}
+
+.editor-panel__header strong {
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.editor-panel__path {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.editor-panel__body {
+  min-height: 0;
+  flex: 1;
+}
+
+.editor-surface {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel-strong);
+}
+
+.editor-surface--markdown {
+  padding: 20px;
+  overflow: auto;
+}
+
+.editor-warning {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  margin: 0 0 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(140, 93, 18, 0.18);
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+.code-editor-shell {
+  flex: 1;
+  min-height: 0;
+}
+
+.code-editor-shell .cm-editor {
+  height: 100%;
+  font-size: 0.95rem;
+}
+
+.code-editor-shell .cm-focused {
+  outline: none;
+}
+
+.unsupported-file {
+  margin: 20px;
+}
+
+.empty-state {
+  min-height: calc(100vh - 36px);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 48px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 32px;
+  background: rgba(255, 253, 249, 0.62);
+}
+
+.empty-state h2 {
+  margin: 0 0 10px;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+@media (max-width: 960px) {
+  .workspace-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-shell {
+    max-height: 260px;
+  }
+
+  .editor-panel {
+    min-height: 70vh;
+  }
+
+  .editor-panel__header,
+  .editor-warning {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .landing-panel {
+    padding: 32px;
+    border-radius: 24px;
+  }
+}

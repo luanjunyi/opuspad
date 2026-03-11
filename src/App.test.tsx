@@ -83,7 +83,7 @@ describe('App', () => {
 
   it('renders headline', () => {
     render(<App />);
-    expect(screen.getByText('Markdown Editor')).toBeInTheDocument();
+    expect(screen.getByText('Quiet local editing for notes, specs, and source files.')).toBeInTheDocument();
   });
 
   it('ignores stale file-load results when a newer selection finishes first', async () => {

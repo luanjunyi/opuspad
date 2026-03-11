@@ -24,6 +24,8 @@ describe('MockFileSystemService', () => {
       content: 'Updated nested content',
       editor: 'text',
       warning: undefined,
+      canOpenInSourceMode: false,
+      canOpenInRichMode: false,
     });
 
     const topLevelNodes = await service.readDirectory({} as FileSystemDirectoryHandle);

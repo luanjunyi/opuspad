@@ -8,14 +8,16 @@ import { ActiveFile } from '../types';
 interface TextEditorProps {
   activeFile: ActiveFile;
   onSave: (content: string) => void;
+  onOpenInRichMode: () => void;
 }
 
-export function TextEditor({ activeFile, onSave }: TextEditorProps) {
+export function TextEditor({ activeFile, onSave, onOpenInRichMode }: TextEditorProps) {
   const fileState = activeFile.state;
   
   if (fileState.kind === 'error') {
     return (
-      <div style={{ padding: '20px', color: 'red', border: '1px solid red', borderRadius: '4px', backgroundColor: '#fee' }}>
+      <div className="unsupported-file">
+        <p className="unsupported-file__eyebrow">Unavailable</p>
         <h3>Unsupported File</h3>
         <p><strong>Reason:</strong> {fileState.reason}</p>
         <p>{fileState.message}</p>
@@ -55,13 +57,21 @@ export function TextEditor({ activeFile, onSave }: TextEditorProps) {
   }, []);
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div className="editor-surface">
       {fileState.warning && (
-        <div style={{ padding: '10px', backgroundColor: '#fff3cd', color: '#856404', borderBottom: '1px solid #ffeeba' }}>
-          <strong>Warning:</strong> {fileState.warning}
+        <div className="editor-warning">
+          <div>
+            <p className="editor-warning__eyebrow">Source mode recommended</p>
+            <p className="editor-warning__text">{fileState.warning}</p>
+          </div>
+          {fileState.canOpenInRichMode && (
+            <button className="ghost-button" onClick={onOpenInRichMode} type="button">
+              Open rich editor
+            </button>
+          )}
         </div>
       )}
-      <div style={{ flex: 1, overflow: 'auto' }}>
+      <div className="code-editor-shell">
         <CodeMirror
           value={content}
           height="100%"

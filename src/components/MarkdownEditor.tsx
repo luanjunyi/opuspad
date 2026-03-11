@@ -9,11 +9,13 @@ import { ActiveFile } from "../types";
 interface MarkdownEditorProps {
   activeFile: ActiveFile;
   onSave: (content: string) => void;
+  onOpenInSourceMode: () => void;
 }
 
-export function MarkdownEditor({ activeFile, onSave }: MarkdownEditorProps) {
+export function MarkdownEditor({ activeFile, onSave, onOpenInSourceMode }: MarkdownEditorProps) {
   const [editor, setEditor] = useState<BlockNoteEditor | null>(null);
   const latestLoadId = useRef(0);
+  const editorRef = useRef<BlockNoteEditor | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -33,6 +35,7 @@ export function MarkdownEditor({ activeFile, onSave }: MarkdownEditorProps) {
       }
 
       if (!cancelled && loadId === latestLoadId.current) {
+        editorRef.current = e;
         setEditor(e);
       }
     }
@@ -43,10 +46,16 @@ export function MarkdownEditor({ activeFile, onSave }: MarkdownEditorProps) {
       cancelled = true;
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
+        if (editorRef.current) {
+          void Promise.resolve(editorRef.current.blocksToMarkdownLossy(editorRef.current.document)).then((markdown) => {
+            onSave(markdown);
+          });
+        }
         saveTimeoutRef.current = null;
       }
+      editorRef.current = null;
     };
-  }, [activeFile.node.path]); // Re-load if path changes
+  }, [activeFile.node.path, onSave]); // Re-load if path changes
 
   const handleChange = useCallback(() => {
     if (!editor) return;
@@ -57,7 +66,7 @@ export function MarkdownEditor({ activeFile, onSave }: MarkdownEditorProps) {
 
     const currentEditor = editor;
     saveTimeoutRef.current = setTimeout(async () => {
-      const markdown = await currentEditor.blocksToMarkdownLossy(currentEditor.document);
+      const markdown = await Promise.resolve(currentEditor.blocksToMarkdownLossy(currentEditor.document));
       onSave(markdown);
       saveTimeoutRef.current = null;
     }, 500);
@@ -68,7 +77,20 @@ export function MarkdownEditor({ activeFile, onSave }: MarkdownEditorProps) {
   }
 
   return (
-    <div style={{ padding: "20px", height: "100%", overflowY: "auto" }}>
+    <div className="editor-surface editor-surface--markdown">
+      {activeFile.state.kind === 'text' && activeFile.state.warning && (
+        <div className="editor-warning">
+          <div>
+            <p className="editor-warning__eyebrow">Rich preview, careful save</p>
+            <p className="editor-warning__text">{activeFile.state.warning}</p>
+          </div>
+          {activeFile.state.canOpenInSourceMode && (
+            <button className="ghost-button" onClick={onOpenInSourceMode} type="button">
+              Open source
+            </button>
+          )}
+        </div>
+      )}
       <BlockNoteView
         editor={editor}
         onChange={handleChange}

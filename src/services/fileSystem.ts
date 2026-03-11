@@ -83,18 +83,21 @@ export const BrowserFileSystemService: FileSystemService = {
 
       let editor: "markdown" | "text" = "text";
       let warning: string | undefined = undefined;
+      let canOpenInSourceMode = false;
+      let canOpenInRichMode = false;
 
       if (isMarkdownPath(path)) {
+        editor = "markdown";
+        canOpenInSourceMode = true;
         const compat = await checkMarkdownCompatibility(content);
-        if (compat.compatible) {
-          editor = "markdown";
-        } else {
-          editor = "text";
-          warning = compat.warning || 'Opened in source mode because this Markdown file cannot round-trip safely through the block editor.';
+        if (!compat.compatible) {
+          warning = compat.warning || 'This Markdown may be rewritten when saved from the rich editor. Review the rich preview and switch to source mode if exact formatting matters.';
         }
+      } else {
+        canOpenInRichMode = false;
       }
 
-      return { kind: 'text', path, content, editor, warning };
+      return { kind: 'text', path, content, editor, warning, canOpenInSourceMode, canOpenInRichMode };
     } catch (error: any) {
       return { kind: 'error', path, reason: 'read_failed', message: error.message || 'Failed to read file' };
     }

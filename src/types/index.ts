@@ -14,6 +14,8 @@ export type LoadFileResult =
       content: string;
       editor: "markdown" | "text";
       warning?: string;
+      canOpenInSourceMode?: boolean;
+      canOpenInRichMode?: boolean;
     }
   | {
       kind: "error";

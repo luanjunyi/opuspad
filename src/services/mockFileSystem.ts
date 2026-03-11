@@ -116,19 +116,19 @@ export class MockFileSystemService implements FileSystemService {
 
       let editor: "markdown" | "text" = "text";
       let warning: string | undefined = undefined;
+      let canOpenInSourceMode = false;
+      let canOpenInRichMode = false;
 
       const lower = path.toLowerCase();
       if (lower.endsWith('.md') || lower.endsWith('.markdown')) {
-        // Simple mock of compatibility: if it contains table, incompatible
+        editor = "markdown";
+        canOpenInSourceMode = true;
         if (content.includes('|--')) {
-           editor = "text";
-           warning = 'Opened in source mode because this Markdown file cannot round-trip safely through the block editor.';
-        } else {
-           editor = "markdown";
+           warning = 'This Markdown may be rewritten when saved from the rich editor. Review the rich preview and switch to source mode if exact formatting matters.';
         }
       }
 
-      return { kind: 'text', path, content, editor, warning };
+      return { kind: 'text', path, content, editor, warning, canOpenInSourceMode, canOpenInRichMode };
 
     } catch (e: any) {
       return { kind: 'error', path, reason: 'read_failed', message: e.message || 'Failed to read' };

@@ -12,12 +12,13 @@ test('markdown editor routes correctly based on compatibility', async ({ page })
   // Verify BlockNote is visible (.bn-editor is the class BlockNote uses)
   await expect(page.locator('.bn-editor')).toBeVisible();
   
-  // Open notes-with-table.md (incompatible markdown)
+  // Open notes-with-table.md (markdown with a fidelity warning)
   await page.click('text="notes-with-table.md"');
 
-  // Verify CodeMirror is visible instead
-  await expect(page.locator('.cm-editor')).toBeVisible();
+  // Verify BlockNote still opens by default
+  await expect(page.locator('.bn-editor')).toBeVisible();
   
-  // Verify warning banner
-  await expect(page.locator('text="Opened in source mode because this Markdown file cannot round-trip safely through the block editor."')).toBeVisible();
+  // Verify warning banner and source-mode toggle
+  await expect(page.locator('text=/This Markdown may be rewritten when saved from the rich editor/')).toBeVisible();
+  await expect(page.locator('text="Open source"')).toBeVisible();
 });

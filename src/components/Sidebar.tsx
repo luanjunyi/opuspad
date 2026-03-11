@@ -68,18 +68,18 @@ export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: Sideb
     return (
       <div key={node.path}>
         <div
-          style={{ paddingLeft: `${depth * 12 + 8}px`, display: 'flex', alignItems: 'center', cursor: 'pointer', paddingBottom: '4px', paddingTop: '4px' }}
+          style={{ paddingLeft: `${depth * 14 + 16}px` }}
           onClick={() => node.kind === 'directory' ? toggleDirectory(node) : onFileSelect(node)}
           className="sidebar-item"
         >
           {node.kind === 'directory' ? (
-            isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />
+            isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />
           ) : (
-             <span style={{width: 16, display: 'inline-block'}} />
+             <span className="sidebar-item__spacer" />
           )}
-          {node.kind === 'directory' ? <Folder size={16} style={{marginRight: 4, marginLeft: 4}} /> : <File size={16} style={{marginRight: 4, marginLeft: 4}} />}
-          <span>{node.name}</span>
-          {isLoading && <span style={{marginLeft: 8, fontSize: '10px'}}>...</span>}
+          {node.kind === 'directory' ? <Folder size={14} /> : <File size={14} />}
+          <span className="sidebar-item__label">{node.name}</span>
+          {isLoading && <span className="sidebar-item__loading">loading</span>}
         </div>
         {isExpanded && node.children && (
           <div>
@@ -91,9 +91,12 @@ export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: Sideb
   };
 
   return (
-    <div style={{ width: '250px', borderRight: '1px solid #ccc', height: '100vh', overflowY: 'auto', backgroundColor: '#f9f9f9' }}>
-      <div style={{ padding: '8px', fontWeight: 'bold', borderBottom: '1px solid #ccc' }}>Workspace</div>
+    <aside className="sidebar-shell">
+      <div className="sidebar-shell__header">
+        <p className="sidebar-shell__eyebrow">Workspace</p>
+        <h2>Local files</h2>
+      </div>
       {nodes.map(n => renderNode(n))}
-    </div>
+    </aside>
   );
 }

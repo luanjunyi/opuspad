@@ -78,46 +78,92 @@ export default function App() {
     }
   };
 
+  const openInSourceMode = () => {
+    setActiveFile((current) => {
+      if (!current || current.state.kind !== 'text') return current;
+      return {
+        ...current,
+        state: {
+          ...current.state,
+          editor: 'text',
+          canOpenInRichMode: true,
+        },
+      };
+    });
+  };
+
+  const openInRichMode = () => {
+    setActiveFile((current) => {
+      if (!current || current.state.kind !== 'text') return current;
+      return {
+        ...current,
+        state: {
+          ...current.state,
+          editor: 'markdown',
+          canOpenInSourceMode: true,
+        },
+      };
+    });
+  };
+
   const isMock = new URLSearchParams(window.location.search).get('fs') === 'mock';
 
   return (
-    <div style={{ display: 'flex', height: '100vh', margin: 0, fontFamily: 'sans-serif' }}>
+    <div className="app-shell">
       {!rootHandle ? (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <h2>Markdown Editor</h2>
-          <button 
-            onClick={mountWorkspace}
-            style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
-          >
-            {isMock ? 'Open Fixture Workspace' : 'Open Folder'}
-          </button>
-          {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
-          {permissionError && <p style={{ color: 'red', marginTop: '10px' }}>Permission denied to read the workspace.</p>}
-        </div>
+        <main className="landing-shell">
+          <section className="landing-panel">
+            <p className="landing-panel__eyebrow">Markdown editor chrome</p>
+            <h1>Quiet local editing for notes, specs, and source files.</h1>
+            <p className="landing-panel__copy">
+              Open a folder, move between rich and source editing, and keep exact Markdown formatting visible when fidelity matters.
+            </p>
+            <button className="primary-button" onClick={mountWorkspace} type="button">
+              {isMock ? 'Open Fixture Workspace' : 'Open Folder'}
+            </button>
+            {(error || permissionError) && (
+              <div className="landing-panel__error">
+                {error && <p>{error}</p>}
+                {permissionError && <p>Permission denied to read the workspace.</p>}
+              </div>
+            )}
+          </section>
+        </main>
       ) : (
-        <>
+        <div className="workspace-shell">
           <Sidebar 
             nodes={nodes} 
             onFileSelect={handleFileSelect} 
             rootHandle={rootHandle}
           />
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <main className="workspace-main">
             {activeFile ? (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                <div style={{ padding: '10px', backgroundColor: '#eee', borderBottom: '1px solid #ccc' }}>
-                  <strong>{activeFile.node.name}</strong>
-                </div>
-                <div style={{ flex: 1, overflow: 'hidden' }}>
-                  <EditorRouter activeFile={activeFile} onSave={handleSave} />
+              <div className="editor-panel">
+                <header className="editor-panel__header">
+                  <div>
+                    <p className="editor-panel__eyebrow">{activeFile.state.kind === 'text' ? activeFile.state.editor === 'markdown' ? 'Rich mode' : 'Source mode' : 'Unavailable'}</p>
+                    <strong>{activeFile.node.name}</strong>
+                  </div>
+                  <span className="editor-panel__path">{activeFile.node.path}</span>
+                </header>
+                <div className="editor-panel__body">
+                  <EditorRouter
+                    activeFile={activeFile}
+                    onSave={handleSave}
+                    onOpenInSourceMode={openInSourceMode}
+                    onOpenInRichMode={openInRichMode}
+                  />
                 </div>
               </div>
             ) : (
-              <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
-                Select a file to start editing
+              <div className="empty-state">
+                <p className="empty-state__eyebrow">Nothing selected</p>
+                <h2>Choose a file from the left.</h2>
+                <p>Markdown opens in rich mode first. If the file may not save back cleanly, you will see a warning and can switch to source mode.</p>
               </div>
             )}
-          </div>
-        </>
+          </main>
+        </div>
       )}
     </div>
   );

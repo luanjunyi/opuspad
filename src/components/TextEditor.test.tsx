@@ -11,7 +11,7 @@ describe('TextEditor', () => {
       node: { name: 'img.png', kind: 'file', path: 'img.png', handle: null },
       state: { kind: 'error', path: 'img.png', reason: 'binary', message: 'Binary files cannot be edited' }
     };
-    render(<TextEditor activeFile={activeFile} onSave={vi.fn()} />);
+    render(<TextEditor activeFile={activeFile} onSave={vi.fn()} onOpenInRichMode={vi.fn()} />);
     expect(screen.getByText('Unsupported File')).toBeInTheDocument();
     expect(screen.getByText('Binary files cannot be edited')).toBeInTheDocument();
   });
@@ -20,9 +20,9 @@ describe('TextEditor', () => {
   it('renders warning if present', () => {
     const activeFile: ActiveFile = {
       node: { name: 'notes.md', kind: 'file', path: 'notes.md', handle: null },
-      state: { kind: 'text', path: 'notes.md', content: 'test', editor: 'text', warning: 'Markdown warning' }
+      state: { kind: 'text', path: 'notes.md', content: 'test', editor: 'text', warning: 'Markdown warning', canOpenInRichMode: true }
     };
-    render(<TextEditor activeFile={activeFile} onSave={vi.fn()} />);
+    render(<TextEditor activeFile={activeFile} onSave={vi.fn()} onOpenInRichMode={vi.fn()} />);
     expect(screen.getByText(/Markdown warning/)).toBeInTheDocument();
   });
 });
