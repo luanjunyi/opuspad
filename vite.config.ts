@@ -10,6 +10,10 @@ export default defineConfig({
     crx({ manifest }),
   ],
   server: {
+    // CRXJS dev injects background worker imports from http://localhost even
+    // when the Vite server is bound to 127.0.0.1, so allow cross-origin module
+    // requests from the extension origin during local development.
+    cors: true,
     host: '127.0.0.1',
     port: 5173,
     strictPort: true,
