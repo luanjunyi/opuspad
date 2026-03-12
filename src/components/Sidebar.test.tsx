@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Sidebar } from './Sidebar';
@@ -156,6 +156,39 @@ describe('Sidebar', () => {
     });
   });
 
+  it('skips common generated directories when building the search index', async () => {
+    const docsDir = createDirectory('docs');
+    const nodeModulesDir = createDirectory('node_modules');
+
+    mockFsService.readDirectory.mockImplementation((_handle: unknown, path?: string) => {
+      if (path === 'docs') {
+        return Promise.resolve([createFile('docs/getting-started.md')]);
+      }
+
+      if (path === 'node_modules') {
+        return Promise.resolve([createFile('node_modules/react/index.js')]);
+      }
+
+      return Promise.resolve([]);
+    });
+
+    render(
+      <Sidebar
+        nodes={[docsDir, nodeModulesDir]}
+        onFileSelect={vi.fn()}
+        rootHandle={rootHandle}
+      />
+    );
+
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Search files' }), 'react');
+
+    await waitFor(() => {
+      expect(screen.getByText('No matching files')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('node_modules/react/index.js')).not.toBeInTheDocument();
+  });
+
   it('moves focus to the first search result when pressing ArrowDown in the search box', async () => {
     const docsDir = createDirectory('docs');
 
@@ -186,7 +219,7 @@ describe('Sidebar', () => {
     });
 
     search.focus();
-    fireEvent.keyDown(search, { key: 'ArrowDown' });
+    await userEvent.keyboard('{ArrowDown}');
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /getting-started\.md/i })).toHaveFocus();

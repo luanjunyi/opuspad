@@ -1,4 +1,4 @@
-import React, { useDeferredValue, useEffect, useRef, useState } from 'react';
+import React, { startTransition, useDeferredValue, useEffect, useRef, useState } from 'react';
 import { FileNode } from '../types';
 import { ChevronRight, ChevronDown, File, Folder, Search, Sparkles } from 'lucide-react';
 import { getFileSystemService } from '../services';
@@ -10,6 +10,19 @@ interface SidebarProps {
   onFileSelect: (node: FileNode) => void;
   rootHandle: FileSystemDirectoryHandle | null;
 }
+
+const SEARCH_IGNORED_DIRECTORY_NAMES = new Set([
+  '.git',
+  '.next',
+  '.nuxt',
+  '.turbo',
+  '.yarn',
+  'build',
+  'coverage',
+  'dist',
+  'node_modules',
+]);
+const SEARCH_INDEX_FLUSH_SIZE = 200;
 
 export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: SidebarProps) {
   const [nodes, setNodes] = useState<FileNode[]>(initialNodes);
@@ -29,7 +42,7 @@ export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: Sideb
   }, [initialNodes]);
 
   useEffect(() => {
-    setIndexedFiles(collectFiles(initialNodes));
+    setIndexedFiles(collectSearchableFiles(initialNodes));
     setIndexingState('idle');
   }, [initialNodes]);
 
@@ -45,16 +58,30 @@ export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: Sideb
 
       const fsService = getFileSystemService();
       const indexedByPath = new Map<string, FileNode>();
+      let filesSinceLastFlush = 0;
+
+      const flushIndexedFiles = () => {
+        if (cancelled) {
+          return;
+        }
+
+        const nextIndexedFiles = Array.from(indexedByPath.values());
+        filesSinceLastFlush = 0;
+        startTransition(() => {
+          setIndexedFiles(nextIndexedFiles);
+        });
+      };
 
       const pushFiles = (entries: FileNode[]) => {
         for (const entry of entries) {
           if (entry.kind === 'file') {
             indexedByPath.set(entry.path, entry);
+            filesSinceLastFlush += 1;
           }
         }
 
-        if (!cancelled) {
-          setIndexedFiles(Array.from(indexedByPath.values()));
+        if (filesSinceLastFlush >= SEARCH_INDEX_FLUSH_SIZE) {
+          flushIndexedFiles();
         }
       };
 
@@ -66,21 +93,23 @@ export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: Sideb
         pushFiles(entries);
 
         for (const entry of entries) {
-          if (entry.kind === 'directory' && entry.handle) {
+          if (entry.kind === 'directory' && entry.handle && !shouldSkipSearchDirectory(entry)) {
             await walkDirectory(entry.handle as FileSystemDirectoryHandle, entry.path);
           }
         }
       };
 
-      pushFiles(initialNodes);
+      pushFiles(collectSearchableFiles(initialNodes));
+      flushIndexedFiles();
 
       for (const node of initialNodes) {
-        if (node.kind === 'directory' && node.handle) {
+        if (node.kind === 'directory' && node.handle && !shouldSkipSearchDirectory(node)) {
           await walkDirectory(node.handle as FileSystemDirectoryHandle, node.path);
         }
       }
 
       if (!cancelled) {
+        flushIndexedFiles();
         setIndexingState('ready');
       }
     };
@@ -329,16 +358,24 @@ export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: Sideb
   );
 }
 
-function collectFiles(nodes: FileNode[]): FileNode[] {
+function collectSearchableFiles(nodes: FileNode[]): FileNode[] {
   return nodes.flatMap((node) => {
     if (node.kind === 'file') {
       return [node];
+    }
+
+    if (shouldSkipSearchDirectory(node)) {
+      return [];
     }
 
     if (!node.children) {
       return [];
     }
 
-    return collectFiles(node.children);
+    return collectSearchableFiles(node.children);
   });
+}
+
+function shouldSkipSearchDirectory(node: Pick<FileNode, 'kind' | 'name'>): boolean {
+  return node.kind === 'directory' && SEARCH_IGNORED_DIRECTORY_NAMES.has(node.name);
 }
