@@ -3,7 +3,11 @@ import { MockFileSystemService } from './mockFileSystem';
 
 describe('MockFileSystemService', () => {
   it('writes nested files back to their full path instead of flattening them to the root', async () => {
-    const service = new MockFileSystemService();
+    const service = new MockFileSystemService({
+      folder1: {
+        'nested.txt': 'Original nested content',
+      },
+    });
     const rootNodes = await service.readDirectory({} as FileSystemDirectoryHandle);
     const folderNode = rootNodes.find((node) => node.path === 'folder1');
 
@@ -30,5 +34,30 @@ describe('MockFileSystemService', () => {
 
     const topLevelNodes = await service.readDirectory({} as FileSystemDirectoryHandle);
     expect(topLevelNodes.some((node) => node.path === 'nested.txt')).toBe(false);
+  });
+
+  it('creates files in the requested directory instead of the root', async () => {
+    const service = new MockFileSystemService({
+      docs: {},
+    });
+    const rootNodes = await service.readDirectory({} as FileSystemDirectoryHandle);
+    const docsNode = rootNodes.find((node) => node.path === 'docs');
+
+    expect(docsNode).toBeDefined();
+    expect(docsNode?.kind).toBe('directory');
+
+    const createdNode = await service.createFile(
+      docsNode!.handle as FileSystemDirectoryHandle,
+      docsNode!.path,
+      'draft.md'
+    );
+
+    expect(createdNode.path).toBe('docs/draft.md');
+
+    const nestedNodes = await service.readDirectory(docsNode!.handle as FileSystemDirectoryHandle, docsNode!.path);
+    expect(nestedNodes.some((node) => node.path === 'docs/draft.md')).toBe(true);
+
+    const topLevelNodes = await service.readDirectory({} as FileSystemDirectoryHandle);
+    expect(topLevelNodes.some((node) => node.path === 'draft.md')).toBe(false);
   });
 });

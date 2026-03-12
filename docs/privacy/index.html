@@ -1,15 +1,234 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Privacy Policy</title>
-  <style>
-    html, body { height: 100%; margin: 0; }
-    iframe { border: 0; width: 100%; height: 100%; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | OpusPad</title>
+    <meta name="description" content="OpusPad Privacy Policy - Local-first, private, and secure Markdown editing.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f8fafc;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --accent: #2563eb;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --font: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo img {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            transform: scaleX(-1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        main {
+            padding-top: 140px;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 5%;
+        }
+
+        .header {
+            margin-bottom: 48px;
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #eff6ff;
+            color: var(--accent);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+        }
+
+        .last-updated {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .content {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 48px;
+            border-radius: var(--radius);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 40px 0 16px;
+            color: var(--text-primary);
+        }
+
+        h2:first-child {
+            margin-top: 0;
+        }
+
+        p, ul {
+            margin-bottom: 24px;
+            color: var(--text-secondary);
+        }
+
+        ul {
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: var(--text-primary);
+        }
+
+        footer {
+            padding: 64px 0 32px;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .content { padding: 32px; }
+        }
+    </style>
 </head>
 <body>
-  <iframe src="../privacy.html"></iframe>
+    <nav>
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1100px;">
+            <a href="../index.html" class="logo">
+                <img src="../../icon128.png" alt="OpusPad Logo">
+                OpusPad
+            </a>
+            <div class="nav-links">
+                <a href="../index.html#features">Features</a>
+                <a href="https://github.com/luanjunyi/md-editor-in-chrome" target="_blank">Source</a>
+                <a href="../index.html">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="header">
+                <div class="badge">Privacy First</div>
+                <h1>Privacy Policy</h1>
+                <p class="last-updated">Last Updated: March 2026</p>
+            </div>
+
+            <div class="content">
+                <h2>1. Introduction</h2>
+                <p>This Privacy Policy explains how OpusPad ("Extension", "we", "us", or "our") handles your data. OpusPad is designed from the ground up to be entirely private and local-first.</p>
+
+                <h2>2. Single Purpose</h2>
+                <p>The sole purpose of the OpusPad Chrome Extension is to allow users to edit local text and markdown files directly within their browser. We bridge the gap between AI text generation and human editing by providing a local WYSIWYG environment.</p>
+
+                <h2>3. Data Collection and Usage</h2>
+                <p><strong>We do not collect, transmit, distribute, or sell any of your data.</strong></p>
+                <ul>
+                    <li><strong>Local Operation:</strong> The extension operates entirely on your local machine.</li>
+                    <li><strong>File Access:</strong> We utilize the native Web File System Access API. File access is strictly user-initiated (e.g., when you click "Open Folder" and explicitly grant permission via Chrome's native security dialogs).</li>
+                    <li><strong>No Telemetry:</strong> There are no analytics, crash reporters, or tracking scripts embedded in the extension.</li>
+                    <li><strong>No Backend:</strong> We do not operate any servers that receive your data. Your markdown files and workspace structures never leave your computer.</li>
+                </ul>
+
+                <h2>4. Permissions Justification</h2>
+                <p>OpusPad requires access to your local file system to function as a text editor. This functionality relies on standard web APIs (specifically, <code>showDirectoryPicker</code> and <code>FileSystemDirectoryHandle</code>) that require explicit user consent per Chrome's security model.</p>
+
+                <h2>5. Chromium Web Store Compliance</h2>
+                <p>This policy is designed to comply with the Google Chrome Web Store Developer Program Policies, specifically the User Data Privacy policy. As we collect zero user data, our strict "local-only" architecture inherently protects your privacy.</p>
+
+                <h2>6. Changes to This Policy</h2>
+                <p>If we ever introduce features that require a change to how data is handled, this policy will be updated and users will be explicitly notified to opt-in before using such features. Currently, no such features exist or are planned.</p>
+
+                <h2>7. Contact</h2>
+                <p>If you have any questions or concerns about this privacy policy, please open an issue on our GitHub repository.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            © 2026 OpusPad. All rights reserved.
+        </div>
+    </footer>
 </body>
 </html>

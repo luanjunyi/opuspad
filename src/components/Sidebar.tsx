@@ -1,13 +1,15 @@
 import React, { startTransition, useDeferredValue, useEffect, useRef, useState } from 'react';
 import { FileNode } from '../types';
-import { ChevronRight, ChevronDown, File, Folder, Search, Sparkles } from 'lucide-react';
+import { ChevronRight, ChevronDown, File, Folder, Plus, Search, Sparkles, X } from 'lucide-react';
 import { getFileSystemService } from '../services';
 import { fuzzyMatchPath, sortFuzzyMatches } from '../utils/fuzzySearch';
 import { isMarkdownPath } from '../utils/fileType';
 
 interface SidebarProps {
   nodes: FileNode[];
+  onCreateFile: (directory: FileNode | null, fileName: string) => Promise<FileNode>;
   onFileSelect: (node: FileNode) => void;
+  onNodesChange: (nodes: FileNode[]) => void;
   rootHandle: FileSystemDirectoryHandle | null;
 }
 
@@ -24,10 +26,17 @@ const SEARCH_IGNORED_DIRECTORY_NAMES = new Set([
 ]);
 const SEARCH_INDEX_FLUSH_SIZE = 200;
 
-export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: SidebarProps) {
+export function Sidebar({
+  nodes: initialNodes,
+  onCreateFile,
+  onFileSelect,
+  onNodesChange,
+  rootHandle,
+}: SidebarProps) {
   const [nodes, setNodes] = useState<FileNode[]>(initialNodes);
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [loadingPaths, setLoadingPaths] = useState<Set<string>>(new Set());
+  const [selectedDirectoryPath, setSelectedDirectoryPath] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [markdownOnly, setMarkdownOnly] = useState(false);
   const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -35,7 +44,18 @@ export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: Sideb
   const [indexedFiles, setIndexedFiles] = useState<FileNode[]>([]);
   const [indexingState, setIndexingState] = useState<'idle' | 'indexing' | 'ready'>('idle');
   const [activeSearchResultIndex, setActiveSearchResultIndex] = useState<number | null>(null);
+  const [isCreatingFile, setIsCreatingFile] = useState(false);
+  const [newFileName, setNewFileName] = useState('');
+  const [createError, setCreateError] = useState<string | null>(null);
   const resultButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  const updateNodes = (updater: (currentNodes: FileNode[]) => FileNode[]) => {
+    setNodes((currentNodes) => {
+      const nextNodes = updater(currentNodes);
+      onNodesChange(nextNodes);
+      return nextNodes;
+    });
+  };
 
   useEffect(() => {
     setNodes(initialNodes);
@@ -45,6 +65,16 @@ export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: Sideb
     setIndexedFiles(collectSearchableFiles(initialNodes));
     setIndexingState('idle');
   }, [initialNodes]);
+
+  useEffect(() => {
+    if (!selectedDirectoryPath) {
+      return;
+    }
+
+    if (!findNodeByPath(initialNodes, selectedDirectoryPath)) {
+      setSelectedDirectoryPath(null);
+    }
+  }, [initialNodes, selectedDirectoryPath]);
 
   useEffect(() => {
     if (!rootHandle || !hasActiveSearch || indexingState !== 'idle') {
@@ -185,22 +215,8 @@ export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: Sideb
         // Read directory children
         // In real FS, we should pass the directory handle. We assume the handle on node is it.
         const children = await fsService.readDirectory(node.handle as FileSystemDirectoryHandle, node.path);
-        
-        // Update nodes tree
-        setNodes(prevNodes => {
-          const updateTree = (currentNodes: FileNode[]): FileNode[] => {
-            return currentNodes.map(n => {
-              if (n.path === node.path) {
-                return { ...n, children, childrenLoaded: true };
-              }
-              if (n.children) {
-                return { ...n, children: updateTree(n.children) };
-              }
-              return n;
-            });
-          };
-          return updateTree(prevNodes);
-        });
+
+        updateNodes((currentNodes) => replaceDirectoryChildren(currentNodes, node.path, children));
         
         setLoadingPaths(prev => {
           const next = new Set(prev);
@@ -211,19 +227,68 @@ export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: Sideb
     }
   };
 
+  const handleCreateFile = async () => {
+    const fileName = newFileName.trim();
+    if (!fileName) {
+      setCreateError('File name is required');
+      return;
+    }
+
+    const selectedDirectory = selectedDirectoryPath
+      ? findNodeByPath(nodes, selectedDirectoryPath)
+      : null;
+
+    if (selectedDirectoryPath && (!selectedDirectory || selectedDirectory.kind !== 'directory')) {
+      setCreateError('Selected folder is no longer available');
+      return;
+    }
+
+    try {
+      setCreateError(null);
+      const createdNode = await onCreateFile(
+        selectedDirectory && selectedDirectory.kind === 'directory' ? selectedDirectory : null,
+        fileName
+      );
+      updateNodes((currentNodes) => insertNodeIntoTree(currentNodes, selectedDirectoryPath, createdNode));
+      setIsCreatingFile(false);
+      setNewFileName('');
+    } catch (error: any) {
+      setCreateError(error.message || 'Failed to create file');
+    }
+  };
+
   const renderNode = (node: FileNode, depth: number = 0) => {
     const isExpanded = expandedPaths.has(node.path);
     const isLoading = loadingPaths.has(node.path);
+    const isSelectedDirectory = node.kind === 'directory' && node.path === selectedDirectoryPath;
 
     return (
       <div key={node.path}>
         <div
+          aria-selected={isSelectedDirectory}
           style={{ paddingLeft: `${depth * 14 + 16}px` }}
-          onClick={() => node.kind === 'directory' ? toggleDirectory(node) : onFileSelect(node)}
-          className="sidebar-item"
+          onClick={() => {
+            if (node.kind === 'directory') {
+              setSelectedDirectoryPath(node.path);
+              return;
+            }
+
+            onFileSelect(node);
+          }}
+          className={`sidebar-item${isSelectedDirectory ? ' sidebar-item--selected' : ''}`}
         >
           {node.kind === 'directory' ? (
-            isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />
+            <button
+              aria-label={isExpanded ? `Collapse ${node.name}` : `Expand ${node.name}`}
+              className="sidebar-item__toggle"
+              onClick={(event) => {
+                event.stopPropagation();
+                void toggleDirectory(node);
+              }}
+              type="button"
+            >
+              {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            </button>
           ) : (
              <span className="sidebar-item__spacer" />
           )}
@@ -245,6 +310,65 @@ export function Sidebar({ nodes: initialNodes, onFileSelect, rootHandle }: Sideb
       <div className="sidebar-shell__header">
         <p className="sidebar-shell__eyebrow">Workspace</p>
         <h2>{rootHandle ? rootHandle.name : 'Local files'}</h2>
+        <button
+          className="ghost-button sidebar-shell__action"
+          onClick={() => {
+            setCreateError(null);
+            setIsCreatingFile((current) => !current);
+          }}
+          type="button"
+        >
+          <Plus aria-hidden="true" size={14} />
+          <span>New file</span>
+        </button>
+        {isCreatingFile ? (
+          <div className="sidebar-create">
+            <p className="sidebar-create__target">
+              Create in {selectedDirectoryPath ?? rootHandle?.name ?? 'root'}
+            </p>
+            <div className="sidebar-create__row">
+              <input
+                aria-label="New file name"
+                className="sidebar-create__input"
+                onChange={(event) => {
+                  setNewFileName(event.target.value);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    void handleCreateFile();
+                  }
+
+                  if (event.key === 'Escape') {
+                    event.preventDefault();
+                    setCreateError(null);
+                    setIsCreatingFile(false);
+                    setNewFileName('');
+                  }
+                }}
+                placeholder="notes.md"
+                type="text"
+                value={newFileName}
+              />
+              <button className="ghost-button sidebar-create__button" onClick={() => void handleCreateFile()} type="button">
+                Create file
+              </button>
+              <button
+                aria-label="Cancel new file"
+                className="ghost-button sidebar-create__icon"
+                onClick={() => {
+                  setCreateError(null);
+                  setIsCreatingFile(false);
+                  setNewFileName('');
+                }}
+                type="button"
+              >
+                <X aria-hidden="true" size={14} />
+              </button>
+            </div>
+            {createError ? <p className="sidebar-create__error">{createError}</p> : null}
+          </div>
+        ) : null}
       </div>
       <div className="sidebar-search">
         <label className="sidebar-search__field" htmlFor="sidebar-file-search">
@@ -378,4 +502,81 @@ function collectSearchableFiles(nodes: FileNode[]): FileNode[] {
 
 function shouldSkipSearchDirectory(node: Pick<FileNode, 'kind' | 'name'>): boolean {
   return node.kind === 'directory' && SEARCH_IGNORED_DIRECTORY_NAMES.has(node.name);
+}
+
+function findNodeByPath(nodes: FileNode[], path: string): FileNode | null {
+  for (const node of nodes) {
+    if (node.path === path) {
+      return node;
+    }
+
+    if (node.children) {
+      const nestedMatch = findNodeByPath(node.children, path);
+      if (nestedMatch) {
+        return nestedMatch;
+      }
+    }
+  }
+
+  return null;
+}
+
+function insertNodeIntoTree(
+  nodes: FileNode[],
+  directoryPath: string | null,
+  nodeToInsert: FileNode
+): FileNode[] {
+  if (!directoryPath) {
+    return sortFileNodes([...nodes, nodeToInsert]);
+  }
+
+  return nodes.map((node) => {
+    if (node.path === directoryPath && node.kind === 'directory') {
+      return {
+        ...node,
+        children: sortFileNodes([...(node.children ?? []), nodeToInsert]),
+        childrenLoaded: true,
+      };
+    }
+
+    if (!node.children) {
+      return node;
+    }
+
+    return {
+      ...node,
+      children: insertNodeIntoTree(node.children, directoryPath, nodeToInsert),
+    };
+  });
+}
+
+function replaceDirectoryChildren(nodes: FileNode[], directoryPath: string, children: FileNode[]): FileNode[] {
+  return nodes.map((node) => {
+    if (node.path === directoryPath) {
+      return {
+        ...node,
+        children,
+        childrenLoaded: true,
+      };
+    }
+
+    if (!node.children) {
+      return node;
+    }
+
+    return {
+      ...node,
+      children: replaceDirectoryChildren(node.children, directoryPath, children),
+    };
+  });
+}
+
+function sortFileNodes(nodes: FileNode[]): FileNode[] {
+  return [...nodes].sort((left, right) => {
+    if (left.kind === right.kind) {
+      return left.name.localeCompare(right.name);
+    }
+
+    return left.kind === 'directory' ? -1 : 1;
+  });
 }

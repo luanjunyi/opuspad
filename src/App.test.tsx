@@ -10,6 +10,7 @@ const mockFsService = {
   ensurePermission: vi.fn(),
   readDirectory: vi.fn(),
   readEditableFile: vi.fn(),
+  createFile: vi.fn(),
   writeFile: vi.fn(),
 };
 
@@ -46,13 +47,21 @@ vi.mock('./services', () => ({
 }));
 
 vi.mock('./components/Sidebar', () => ({
-  Sidebar: ({ nodes, onFileSelect }: any) => (
+  Sidebar: ({ nodes, onFileSelect, onCreateFile }: any) => (
     <div>
       {nodes.map((node: FileNode) => (
         <button key={node.path} onClick={() => onFileSelect(node)}>
           {node.name}
         </button>
       ))}
+      <button onClick={() => onCreateFile(null, 'root.md')}>New File In Root</button>
+      {nodes
+        .filter((node: FileNode) => node.kind === 'directory')
+        .map((node: FileNode) => (
+          <button key={`create-${node.path}`} onClick={() => onCreateFile(node, 'child.md')}>
+            New File In {node.name}
+          </button>
+        ))}
     </div>
   ),
 }));
@@ -78,6 +87,9 @@ describe('App', () => {
     mockFsService.ensurePermission.mockResolvedValue(true);
     mockFsService.readDirectory.mockResolvedValue([alphaNode, betaNode]);
     mockFsService.readEditableFile.mockResolvedValue(createTextState(alphaNode.path, 'alpha'));
+    mockFsService.createFile.mockImplementation((_handle: unknown, currentPath: string, name: string) =>
+      Promise.resolve(createFileNode(currentPath ? `${currentPath}/${name}` : name))
+    );
     mockFsService.writeFile.mockResolvedValue(undefined);
     window.history.replaceState({}, '', '/');
   });
@@ -171,6 +183,47 @@ describe('App', () => {
 
     await user.click(screen.getByRole('button', { name: 'Dirty' }));
     expect(screen.getByText('Unsaved changes')).toBeInTheDocument();
+  });
+
+  it('creates a new file in the root directory when no folder is selected', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Open Folder' }));
+    await screen.findByRole('button', { name: alphaNode.name });
+
+    await user.click(screen.getByRole('button', { name: 'New File In Root' }));
+
+    expect(mockFsService.createFile).toHaveBeenCalledWith(rootHandle, '', 'root.md');
+
+    await waitFor(() => {
+      expect(screen.getByTestId('active-path')).toHaveTextContent('root.md');
+    });
+  });
+
+  it('creates a new file inside the selected folder', async () => {
+    const docsNode: FileNode = {
+      name: 'docs',
+      kind: 'directory',
+      path: 'docs',
+      handle: { kind: 'directory', name: 'docs', path: 'docs' } as any,
+      childrenLoaded: false,
+    };
+    mockFsService.readDirectory.mockResolvedValue([docsNode]);
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Open Folder' }));
+    await screen.findByRole('button', { name: 'docs' });
+
+    await user.click(screen.getByRole('button', { name: 'New File In docs' }));
+
+    expect(mockFsService.createFile).toHaveBeenCalledWith(docsNode.handle, 'docs', 'child.md');
+
+    await waitFor(() => {
+      expect(screen.getByTestId('active-path')).toHaveTextContent('docs/child.md');
+    });
   });
 
   it('lets the user resize the sidebar by dragging the divider', async () => {

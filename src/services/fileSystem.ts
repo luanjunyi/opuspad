@@ -59,6 +59,52 @@ export const BrowserFileSystemService: FileSystemService = {
     });
   },
 
+  async createFile(
+    dirHandle: FileSystemDirectoryHandle,
+    currentPath: string,
+    rawName: string
+  ): Promise<FileNode> {
+    const name = rawName.trim();
+    if (!name) {
+      throw new Error('File name is required');
+    }
+
+    if (name.includes('/') || name.includes('\\')) {
+      throw new Error('Use a file name, not a path');
+    }
+
+    const hasPermission = await this.ensurePermission(dirHandle, 'readwrite');
+    if (!hasPermission) {
+      throw new Error('Permission denied to create file');
+    }
+
+    try {
+      // @ts-ignore - getFileHandle is part of FileSystemDirectoryHandle
+      await dirHandle.getFileHandle(name);
+      throw new Error('A file with that name already exists');
+    } catch (error: any) {
+      if (error?.message === 'A file with that name already exists') {
+        throw error;
+      }
+
+      if (error?.name && error.name !== 'NotFoundError') {
+        throw error;
+      }
+    }
+
+    // @ts-ignore - getFileHandle is part of FileSystemDirectoryHandle
+    const fileHandle = await dirHandle.getFileHandle(name, { create: true });
+    const path = currentPath ? `${currentPath}/${name}` : name;
+
+    return {
+      name,
+      kind: 'file',
+      path,
+      handle: fileHandle,
+      childrenLoaded: false,
+    };
+  },
+
   async readEditableFile(fileHandle: FileSystemFileHandle, path: string): Promise<LoadFileResult> {
     try {
       const hasPermission = await this.ensurePermission(fileHandle, 'read');

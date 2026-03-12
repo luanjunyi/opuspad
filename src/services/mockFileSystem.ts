@@ -6,8 +6,7 @@ interface MockFileSystemTree {
 
 type MockFileSystemEntry = string | ArrayBuffer | MockFileSystemTree;
 
-export class MockFileSystemService implements FileSystemService {
-  private fileSystem: MockFileSystemTree = {
+const DEFAULT_MOCK_FILE_SYSTEM: MockFileSystemTree = {
     'SUBMISSION_GUIDE.md': `# Submitting to the Chrome Web Store
 
 This guide outlines the steps required to publish the Markdown Editor extension to the Chrome Web Store.
@@ -1105,7 +1104,14 @@ describe('App', () => {
 });
 `
     }
-  };
+};
+
+export class MockFileSystemService implements FileSystemService {
+  private fileSystem: MockFileSystemTree;
+
+  constructor(initialFileSystem: MockFileSystemTree = DEFAULT_MOCK_FILE_SYSTEM) {
+    this.fileSystem = structuredClone(initialFileSystem);
+  }
 
   private isDirectoryEntry(entry: MockFileSystemEntry): entry is MockFileSystemTree {
     return typeof entry === 'object' && entry !== null && !(entry instanceof ArrayBuffer);
@@ -1150,6 +1156,43 @@ describe('App', () => {
 
   async ensurePermission(handle: FileSystemFileHandle | FileSystemDirectoryHandle, mode: "read" | "readwrite"): Promise<boolean> {
     return true;
+  }
+
+  async createFile(
+    _dirHandle: FileSystemDirectoryHandle,
+    currentPath: string,
+    rawName: string
+  ): Promise<FileNode> {
+    const name = rawName.trim();
+    if (!name) {
+      throw new Error('File name is required');
+    }
+
+    if (name.includes('/') || name.includes('\\')) {
+      throw new Error('Use a file name, not a path');
+    }
+
+    const parts = currentPath ? currentPath.split('/') : [];
+    const directory = parts.length === 0 ? this.fileSystem : await this.getByPath(parts);
+
+    if (!this.isDirectoryEntry(directory)) {
+      throw new Error('Target directory not found');
+    }
+
+    if (directory[name] !== undefined) {
+      throw new Error('A file with that name already exists');
+    }
+
+    directory[name] = '';
+    const path = currentPath ? `${currentPath}/${name}` : name;
+
+    return {
+      name,
+      kind: 'file',
+      path,
+      handle: { kind: 'file', name, path } as any,
+      childrenLoaded: false,
+    };
   }
 
   async readDirectory(dirHandle: FileSystemDirectoryHandle, currentPath: string = ''): Promise<FileNode[]> {

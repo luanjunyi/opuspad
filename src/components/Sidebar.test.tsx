@@ -64,7 +64,9 @@ describe('Sidebar', () => {
     render(
       <Sidebar
         nodes={[docsDir, notesDir, createFile('readme.md')]}
+        onCreateFile={vi.fn()}
         onFileSelect={onFileSelect}
+        onNodesChange={vi.fn()}
         rootHandle={rootHandle}
       />
     );
@@ -88,7 +90,9 @@ describe('Sidebar', () => {
     render(
       <Sidebar
         nodes={[createFile('readme.md')]}
+        onCreateFile={vi.fn()}
         onFileSelect={vi.fn()}
+        onNodesChange={vi.fn()}
         rootHandle={rootHandle}
       />
     );
@@ -115,7 +119,9 @@ describe('Sidebar', () => {
     render(
       <Sidebar
         nodes={[docsDir]}
+        onCreateFile={vi.fn()}
         onFileSelect={vi.fn()}
+        onNodesChange={vi.fn()}
         rootHandle={rootHandle}
       />
     );
@@ -144,7 +150,9 @@ describe('Sidebar', () => {
     render(
       <Sidebar
         nodes={[docsDir]}
+        onCreateFile={vi.fn()}
         onFileSelect={vi.fn()}
+        onNodesChange={vi.fn()}
         rootHandle={rootHandle}
       />
     );
@@ -175,7 +183,9 @@ describe('Sidebar', () => {
     render(
       <Sidebar
         nodes={[docsDir, nodeModulesDir]}
+        onCreateFile={vi.fn()}
         onFileSelect={vi.fn()}
+        onNodesChange={vi.fn()}
         rootHandle={rootHandle}
       />
     );
@@ -206,7 +216,9 @@ describe('Sidebar', () => {
     render(
       <Sidebar
         nodes={[docsDir]}
+        onCreateFile={vi.fn()}
         onFileSelect={vi.fn()}
+        onNodesChange={vi.fn()}
         rootHandle={rootHandle}
       />
     );
@@ -223,6 +235,52 @@ describe('Sidebar', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /getting-started\.md/i })).toHaveFocus();
+    });
+  });
+
+  it('creates a new file in the root directory when no folder is selected', async () => {
+    const onCreateFile = vi.fn().mockResolvedValue(createFile('root.md'));
+
+    render(
+      <Sidebar
+        nodes={[createFile('readme.md')]}
+        onCreateFile={onCreateFile}
+        onFileSelect={vi.fn()}
+        onNodesChange={vi.fn()}
+        rootHandle={rootHandle}
+      />
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'New file' }));
+    await userEvent.type(screen.getByRole('textbox', { name: 'New file name' }), 'root.md');
+    await userEvent.click(screen.getByRole('button', { name: 'Create file' }));
+
+    await waitFor(() => {
+      expect(onCreateFile).toHaveBeenCalledWith(null, 'root.md');
+    });
+  });
+
+  it('creates a new file inside the selected directory', async () => {
+    const docsDir = createDirectory('docs');
+    const onCreateFile = vi.fn().mockResolvedValue(createFile('docs/notes.md'));
+
+    render(
+      <Sidebar
+        nodes={[docsDir]}
+        onCreateFile={onCreateFile}
+        onFileSelect={vi.fn()}
+        onNodesChange={vi.fn()}
+        rootHandle={rootHandle}
+      />
+    );
+
+    await userEvent.click(screen.getByText('docs'));
+    await userEvent.click(screen.getByRole('button', { name: 'New file' }));
+    await userEvent.type(screen.getByRole('textbox', { name: 'New file name' }), 'notes.md');
+    await userEvent.click(screen.getByRole('button', { name: 'Create file' }));
+
+    await waitFor(() => {
+      expect(onCreateFile).toHaveBeenCalledWith(expect.objectContaining({ path: 'docs' }), 'notes.md');
     });
   });
 });

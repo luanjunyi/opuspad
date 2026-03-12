@@ -1,4 +1,5 @@
 .codex/
+.antigravity/
 # Dependencies
 node_modules/
 

@@ -35,6 +35,11 @@ export interface FileSystemService {
     handle: FileSystemFileHandle | FileSystemDirectoryHandle,
     mode: "read" | "readwrite"
   ): Promise<boolean>;
+  createFile(
+    dirHandle: FileSystemDirectoryHandle,
+    currentPath: string,
+    name: string
+  ): Promise<FileNode>;
   readDirectory(
     dirHandle: FileSystemDirectoryHandle,
     currentPath?: string

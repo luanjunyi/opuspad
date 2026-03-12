@@ -98,7 +98,7 @@ export default function App() {
     }
   };
 
-  const handleFileSelect = async (node: FileNode) => {
+  const handleFileSelect = useCallback(async (node: FileNode) => {
     if (node.kind !== 'file' || !node.handle) return;
 
     const selectionId = ++latestFileSelectionId.current;
@@ -110,7 +110,21 @@ export default function App() {
       }
       return { node, state };
     });
-  };
+  }, []);
+
+  const handleCreateFile = useCallback(async (directory: FileNode | null, rawName: string) => {
+    if (!rootHandle) {
+      throw new Error('Open a workspace before creating files');
+    }
+
+    const fsService = getFileSystemService();
+    const targetHandle = (directory?.handle as FileSystemDirectoryHandle | null) ?? rootHandle;
+    const targetPath = directory?.path ?? '';
+    const createdNode = await fsService.createFile(targetHandle, targetPath, rawName);
+
+    await handleFileSelect(createdNode);
+    return createdNode;
+  }, [handleFileSelect, rootHandle]);
 
   const handleSave = useCallback(async (content: string) => {
     const currentActiveFile = activeFileRef.current;
@@ -276,7 +290,9 @@ export default function App() {
         >
           <Sidebar 
             nodes={nodes} 
+            onCreateFile={handleCreateFile}
             onFileSelect={handleFileSelect} 
+            onNodesChange={setNodes}
             rootHandle={rootHandle}
           />
           <div

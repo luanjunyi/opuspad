@@ -64,4 +64,33 @@ describe('BrowserFileSystemService', () => {
     expect(nodes[1].name).toBe('test.txt');
     expect(nodes[1].kind).toBe('file');
   });
+
+  it('createFile creates a child file under the provided directory handle', async () => {
+    const createdHandle = { kind: 'file', name: 'notes.md' };
+    const mockDirHandle = {
+      queryPermission: vi.fn().mockResolvedValue('granted'),
+      getFileHandle: vi.fn().mockImplementation((_name: string, options?: { create?: boolean }) => {
+        if (options?.create) {
+          return Promise.resolve(createdHandle);
+        }
+
+        return Promise.reject({ name: 'NotFoundError' });
+      }),
+    };
+
+    const node = await BrowserFileSystemService.createFile(
+      mockDirHandle as any,
+      'docs',
+      'notes.md'
+    );
+
+    expect(mockDirHandle.getFileHandle).toHaveBeenCalledWith('notes.md', { create: true });
+    expect(node).toEqual({
+      name: 'notes.md',
+      kind: 'file',
+      path: 'docs/notes.md',
+      handle: createdHandle,
+      childrenLoaded: false,
+    });
+  });
 });
