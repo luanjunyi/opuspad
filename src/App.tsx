@@ -5,6 +5,10 @@ import { Sidebar } from './components/Sidebar';
 import { EditorRouter } from './components/EditorRouter';
 import { applySavedTextFileState } from './utils/activeFileSave';
 
+const DEFAULT_SIDEBAR_WIDTH = 300;
+const MIN_SIDEBAR_WIDTH = 220;
+const MAX_SIDEBAR_WIDTH = 540;
+
 export default function App() {
   const [rootHandle, setRootHandle] = useState<FileSystemDirectoryHandle | null>(null);
   const [nodes, setNodes] = useState<FileNode[]>([]);
@@ -15,6 +19,8 @@ export default function App() {
   const activeFileRef = useRef<ActiveFile | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'dirty' | 'saving' | 'saved'>('idle');
   const editVersionRef = useRef(0);
+  const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
+  const isResizingSidebarRef = useRef(false);
 
   useEffect(() => {
     activeFileRef.current = activeFile;
@@ -41,6 +47,30 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handlePointerMove = (event: PointerEvent) => {
+      if (!isResizingSidebarRef.current) {
+        return;
+      }
+
+      setSidebarWidth(Math.min(MAX_SIDEBAR_WIDTH, Math.max(MIN_SIDEBAR_WIDTH, event.clientX)));
+    };
+
+    const stopResizingSidebar = () => {
+      isResizingSidebarRef.current = false;
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', stopResizingSidebar);
+    window.addEventListener('pointercancel', stopResizingSidebar);
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', stopResizingSidebar);
+      window.removeEventListener('pointercancel', stopResizingSidebar);
     };
   }, []);
 
@@ -239,11 +269,25 @@ export default function App() {
           </section>
         </main>
       ) : (
-        <div className="workspace-shell">
+        <div
+          className="workspace-shell"
+          data-testid="workspace-shell"
+          style={{ gridTemplateColumns: `${sidebarWidth}px 14px minmax(0, 1fr)` }}
+        >
           <Sidebar 
             nodes={nodes} 
             onFileSelect={handleFileSelect} 
             rootHandle={rootHandle}
+          />
+          <div
+            aria-label="Resize sidebar"
+            aria-orientation="vertical"
+            className="workspace-shell__resize-handle"
+            onPointerDown={() => {
+              isResizingSidebarRef.current = true;
+            }}
+            role="separator"
+            tabIndex={0}
           />
           <main className="workspace-main">
             {activeFile ? (

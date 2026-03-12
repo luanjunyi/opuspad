@@ -173,6 +173,27 @@ describe('App', () => {
     expect(screen.getByText('Unsaved changes')).toBeInTheDocument();
   });
 
+  it('lets the user resize the sidebar by dragging the divider', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Open Folder' }));
+    await screen.findByRole('button', { name: alphaNode.name });
+
+    const workspaceShell = screen.getByTestId('workspace-shell');
+    const resizeHandle = screen.getByRole('separator', { name: 'Resize sidebar' });
+
+    expect(workspaceShell).toHaveStyle({ gridTemplateColumns: '300px 14px minmax(0, 1fr)' });
+
+    act(() => {
+      resizeHandle.dispatchEvent(new PointerEvent('pointerdown', { clientX: 300, bubbles: true }));
+      window.dispatchEvent(new PointerEvent('pointermove', { clientX: 420, bubbles: true }));
+      window.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+    });
+
+    expect(workspaceShell).toHaveStyle({ gridTemplateColumns: '420px 14px minmax(0, 1fr)' });
+  });
+
   it('prevents the browser save shortcut', () => {
     render(<App />);
 

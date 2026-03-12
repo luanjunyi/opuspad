@@ -1,0 +1,195 @@
+import React from 'react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Sidebar } from './Sidebar';
+import type { FileNode } from '../types';
+
+const mockFsService = {
+  readDirectory: vi.fn(),
+};
+
+vi.mock('../services', () => ({
+  getFileSystemService: () => mockFsService,
+}));
+
+function createFile(path: string): FileNode {
+  return {
+    name: path.split('/').pop() || path,
+    kind: 'file',
+    path,
+    handle: { kind: 'file', name: path.split('/').pop() || path } as any,
+  };
+}
+
+function createDirectory(path: string): FileNode {
+  return {
+    name: path.split('/').pop() || path,
+    kind: 'directory',
+    path,
+    handle: { kind: 'directory', name: path.split('/').pop() || path } as any,
+    childrenLoaded: false,
+  };
+}
+
+describe('Sidebar', () => {
+  const rootHandle = { kind: 'directory', name: 'workspace' } as FileSystemDirectoryHandle;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('filters file results in real time using fuzzy matching across nested directories', async () => {
+    const docsDir = createDirectory('docs');
+    const notesDir = createDirectory('notes');
+    const onFileSelect = vi.fn();
+
+    mockFsService.readDirectory.mockImplementation((_handle: unknown, path?: string) => {
+      if (path === 'docs') {
+        return Promise.resolve([
+          createFile('docs/getting-started.md'),
+          createFile('docs/guide-to-markdown.md'),
+        ]);
+      }
+
+      if (path === 'notes') {
+        return Promise.resolve([
+          createFile('notes/meeting-log.md'),
+        ]);
+      }
+
+      return Promise.resolve([]);
+    });
+
+    render(
+      <Sidebar
+        nodes={[docsDir, notesDir, createFile('readme.md')]}
+        onFileSelect={onFileSelect}
+        rootHandle={rootHandle}
+      />
+    );
+
+    const search = screen.getByRole('searchbox', { name: 'Search files' });
+    await userEvent.type(search, 'dgm');
+
+    await waitFor(() => {
+      expect(screen.getByText('docs/guide-to-markdown.md')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('readme.md')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByText('docs/guide-to-markdown.md'));
+    expect(onFileSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ path: 'docs/guide-to-markdown.md' })
+    );
+  });
+
+  it('shows an empty state when no files match the query', async () => {
+    render(
+      <Sidebar
+        nodes={[createFile('readme.md')]}
+        onFileSelect={vi.fn()}
+        rootHandle={rootHandle}
+      />
+    );
+
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Search files' }), 'zzz');
+
+    expect(screen.getByText('No matching files')).toBeInTheDocument();
+  });
+
+  it('can restrict search results to markdown files only', async () => {
+    const docsDir = createDirectory('docs');
+
+    mockFsService.readDirectory.mockImplementation((_handle: unknown, path?: string) => {
+      if (path === 'docs') {
+        return Promise.resolve([
+          createFile('docs/getting-started.md'),
+          createFile('docs/getting-started.txt'),
+        ]);
+      }
+
+      return Promise.resolve([]);
+    });
+
+    render(
+      <Sidebar
+        nodes={[docsDir]}
+        onFileSelect={vi.fn()}
+        rootHandle={rootHandle}
+      />
+    );
+
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Search files' }), 'dgs');
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Markdown only' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('docs/getting-started.md')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('docs/getting-started.txt')).not.toBeInTheDocument();
+  });
+
+  it('matches files through directory names, not just the file name', async () => {
+    const docsDir = createDirectory('docs');
+
+    mockFsService.readDirectory.mockImplementation((_handle: unknown, path?: string) => {
+      if (path === 'docs') {
+        return Promise.resolve([createFile('docs/getting-started.md')]);
+      }
+
+      return Promise.resolve([]);
+    });
+
+    render(
+      <Sidebar
+        nodes={[docsDir]}
+        onFileSelect={vi.fn()}
+        rootHandle={rootHandle}
+      />
+    );
+
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Search files' }), 'dgs');
+
+    await waitFor(() => {
+      expect(screen.getByText('docs/getting-started.md')).toBeInTheDocument();
+    });
+  });
+
+  it('moves focus to the first search result when pressing ArrowDown in the search box', async () => {
+    const docsDir = createDirectory('docs');
+
+    mockFsService.readDirectory.mockImplementation((_handle: unknown, path?: string) => {
+      if (path === 'docs') {
+        return Promise.resolve([
+          createFile('docs/getting-started.md'),
+          createFile('docs/guide-to-markdown.md'),
+        ]);
+      }
+
+      return Promise.resolve([]);
+    });
+
+    render(
+      <Sidebar
+        nodes={[docsDir]}
+        onFileSelect={vi.fn()}
+        rootHandle={rootHandle}
+      />
+    );
+
+    const search = screen.getByRole('searchbox', { name: 'Search files' });
+    await userEvent.type(search, 'dg');
+
+    await waitFor(() => {
+      expect(screen.getByText('docs/getting-started.md')).toBeInTheDocument();
+    });
+
+    search.focus();
+    fireEvent.keyDown(search, { key: 'ArrowDown' });
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /getting-started\.md/i })).toHaveFocus();
+    });
+  });
+});
