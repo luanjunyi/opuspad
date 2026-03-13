@@ -93,4 +93,20 @@ describe('BrowserFileSystemService', () => {
       childrenLoaded: false,
     });
   });
+
+  it('deleteFile removes a file using its relative path from the root handle', async () => {
+    const docsHandle = {
+      getDirectoryHandle: vi.fn(),
+      removeEntry: vi.fn().mockResolvedValue(undefined),
+    };
+    const rootHandle = {
+      queryPermission: vi.fn().mockResolvedValue('granted'),
+      getDirectoryHandle: vi.fn().mockResolvedValue(docsHandle),
+    };
+
+    await BrowserFileSystemService.deleteFile(rootHandle as any, 'docs/notes.md');
+
+    expect(rootHandle.getDirectoryHandle).toHaveBeenCalledWith('docs');
+    expect(docsHandle.removeEntry).toHaveBeenCalledWith('notes.md');
+  });
 });

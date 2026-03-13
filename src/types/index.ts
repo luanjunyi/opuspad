@@ -40,6 +40,7 @@ export interface FileSystemService {
     currentPath: string,
     name: string
   ): Promise<FileNode>;
+  deleteFile(rootHandle: FileSystemDirectoryHandle, path: string): Promise<void>;
   readDirectory(
     dirHandle: FileSystemDirectoryHandle,
     currentPath?: string

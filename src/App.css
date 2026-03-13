@@ -450,6 +450,12 @@ button {
   background: rgba(255, 255, 255, 0.5);
 }
 
+.sidebar-item:hover .sidebar-item__actions,
+.sidebar-item:focus-within .sidebar-item__actions {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 .sidebar-item__toggle {
   display: inline-flex;
   align-items: center;
@@ -473,6 +479,41 @@ button {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.94rem;
+}
+
+.sidebar-item__actions {
+  margin-left: auto;
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.sidebar-item__delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid rgba(141, 49, 33, 0.16);
+  border-radius: 11px;
+  background:
+    linear-gradient(180deg, rgba(255, 246, 243, 0.96), rgba(255, 234, 228, 0.92));
+  color: #8d3121;
+  box-shadow: 0 8px 18px rgba(141, 49, 33, 0.08);
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.sidebar-item__delete:hover {
+  transform: translateY(-1px);
+  border-color: rgba(141, 49, 33, 0.32);
+  box-shadow: 0 12px 24px rgba(141, 49, 33, 0.14);
+}
+
+.sidebar-item__delete:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 
 .sidebar-item__spacer {
@@ -589,6 +630,19 @@ button {
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.workspace-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 4px 4px 0;
+}
+
+.workspace-toolbar__button {
+  padding: 10px 16px;
 }
 
 .editor-panel {
@@ -744,7 +798,8 @@ button {
 }
 
 .empty-state {
-  min-height: calc(100vh - 36px);
+  min-height: 0;
+  flex: 1;
   display: grid;
   place-items: center;
   text-align: center;

@@ -1,6 +1,6 @@
 import React, { startTransition, useDeferredValue, useEffect, useRef, useState } from 'react';
 import { FileNode } from '../types';
-import { ChevronRight, ChevronDown, File, Folder, Plus, Search, Sparkles, X } from 'lucide-react';
+import { ChevronRight, ChevronDown, File, Folder, Plus, Search, Sparkles, Trash2, X } from 'lucide-react';
 import { getFileSystemService } from '../services';
 import { fuzzyMatchPath, sortFuzzyMatches } from '../utils/fuzzySearch';
 import { isMarkdownPath } from '../utils/fileType';
@@ -8,6 +8,7 @@ import { isMarkdownPath } from '../utils/fileType';
 interface SidebarProps {
   nodes: FileNode[];
   onCreateFile: (directory: FileNode | null, fileName: string) => Promise<FileNode>;
+  onDeleteFile: (node: FileNode) => Promise<void>;
   onFileSelect: (node: FileNode) => void;
   onNodesChange: (nodes: FileNode[]) => void;
   rootHandle: FileSystemDirectoryHandle | null;
@@ -29,6 +30,7 @@ const SEARCH_INDEX_FLUSH_SIZE = 200;
 export function Sidebar({
   nodes: initialNodes,
   onCreateFile,
+  onDeleteFile,
   onFileSelect,
   onNodesChange,
   rootHandle,
@@ -47,6 +49,7 @@ export function Sidebar({
   const [isCreatingFile, setIsCreatingFile] = useState(false);
   const [newFileName, setNewFileName] = useState('');
   const [createError, setCreateError] = useState<string | null>(null);
+  const [deletingPath, setDeletingPath] = useState<string | null>(null);
   const resultButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const updateNodes = (updater: (currentNodes: FileNode[]) => FileNode[]) => {
@@ -257,6 +260,15 @@ export function Sidebar({
     }
   };
 
+  const handleDeleteFile = async (node: FileNode) => {
+    try {
+      setDeletingPath(node.path);
+      await onDeleteFile(node);
+    } finally {
+      setDeletingPath(null);
+    }
+  };
+
   const renderNode = (node: FileNode, depth: number = 0) => {
     const isExpanded = expandedPaths.has(node.path);
     const isLoading = loadingPaths.has(node.path);
@@ -294,6 +306,22 @@ export function Sidebar({
           )}
           {node.kind === 'directory' ? <Folder size={14} /> : <File size={14} />}
           <span className="sidebar-item__label">{node.name}</span>
+          {node.kind === 'file' ? (
+            <div className="sidebar-item__actions">
+              <button
+                aria-label={`Delete ${node.name}`}
+                className="sidebar-item__delete"
+                disabled={deletingPath === node.path}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  void handleDeleteFile(node);
+                }}
+                type="button"
+              >
+                <Trash2 aria-hidden="true" size={13} />
+              </button>
+            </div>
+          ) : null}
           {isLoading && <span className="sidebar-item__loading">loading</span>}
         </div>
         {isExpanded && node.children && (

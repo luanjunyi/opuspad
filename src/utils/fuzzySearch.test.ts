@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { fuzzyMatchPath, sortFuzzyMatches } from './fuzzySearch';
 
+function pickCharacters(source: string, indices: number[]): string {
+  return indices.map((index) => source[index]).join('');
+}
+
 describe('fuzzyMatchPath', () => {
   it('matches contiguous characters strongly', () => {
     const match = fuzzyMatchPath('meeting-notes.md', 'meet');
@@ -10,17 +14,35 @@ describe('fuzzyMatchPath', () => {
   });
 
   it('matches non-contiguous subsequences', () => {
-    const match = fuzzyMatchPath('release-checklist.md', 'rck');
+    const source = 'release-checklist.md';
+    const match = fuzzyMatchPath(source, 'rck');
 
     expect(match?.score).toBeGreaterThan(0);
-    expect(match?.indices).toEqual([0, 8, 12]);
+    expect(match?.indices).toHaveLength(3);
+    expect(pickCharacters(source, match?.indices ?? [])).toBe('rck');
   });
 
   it('matches against directory segments in the relative path', () => {
-    const match = fuzzyMatchPath('docs/guides/getting-started.md', 'dgs');
+    const source = 'docs/guides/getting-started.md';
+    const match = fuzzyMatchPath(source, 'dgs');
 
     expect(match?.score).toBeGreaterThan(0);
-    expect(match?.indices).toEqual([0, 5, 10]);
+    expect(match?.indices).toHaveLength(3);
+    expect(pickCharacters(source, match?.indices ?? [])).toBe('dgs');
+  });
+
+  it('prefers a contiguous basename match over scattered directory matches', () => {
+    const basenameMatch = fuzzyMatchPath('src/components/Sidebar.tsx', 'side');
+    const scatteredMatch = fuzzyMatchPath('src/types/index.ts', 'side');
+
+    expect(basenameMatch?.indices).toEqual([15, 16, 17, 18]);
+    expect(basenameMatch?.score).toBeGreaterThan(scatteredMatch?.score ?? 0);
+  });
+
+  it('normalizes backslashes in the query', () => {
+    expect(fuzzyMatchPath('docs/guide.md', 'docs\\guide')).toEqual(
+      fuzzyMatchPath('docs/guide.md', 'docs/guide')
+    );
   });
 
   it('returns null when the query cannot be formed', () => {

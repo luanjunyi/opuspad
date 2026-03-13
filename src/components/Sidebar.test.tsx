@@ -65,6 +65,7 @@ describe('Sidebar', () => {
       <Sidebar
         nodes={[docsDir, notesDir, createFile('readme.md')]}
         onCreateFile={vi.fn()}
+        onDeleteFile={vi.fn()}
         onFileSelect={onFileSelect}
         onNodesChange={vi.fn()}
         rootHandle={rootHandle}
@@ -91,6 +92,7 @@ describe('Sidebar', () => {
       <Sidebar
         nodes={[createFile('readme.md')]}
         onCreateFile={vi.fn()}
+        onDeleteFile={vi.fn()}
         onFileSelect={vi.fn()}
         onNodesChange={vi.fn()}
         rootHandle={rootHandle}
@@ -120,6 +122,7 @@ describe('Sidebar', () => {
       <Sidebar
         nodes={[docsDir]}
         onCreateFile={vi.fn()}
+        onDeleteFile={vi.fn()}
         onFileSelect={vi.fn()}
         onNodesChange={vi.fn()}
         rootHandle={rootHandle}
@@ -151,6 +154,7 @@ describe('Sidebar', () => {
       <Sidebar
         nodes={[docsDir]}
         onCreateFile={vi.fn()}
+        onDeleteFile={vi.fn()}
         onFileSelect={vi.fn()}
         onNodesChange={vi.fn()}
         rootHandle={rootHandle}
@@ -184,6 +188,7 @@ describe('Sidebar', () => {
       <Sidebar
         nodes={[docsDir, nodeModulesDir]}
         onCreateFile={vi.fn()}
+        onDeleteFile={vi.fn()}
         onFileSelect={vi.fn()}
         onNodesChange={vi.fn()}
         rootHandle={rootHandle}
@@ -217,6 +222,7 @@ describe('Sidebar', () => {
       <Sidebar
         nodes={[docsDir]}
         onCreateFile={vi.fn()}
+        onDeleteFile={vi.fn()}
         onFileSelect={vi.fn()}
         onNodesChange={vi.fn()}
         rootHandle={rootHandle}
@@ -245,6 +251,7 @@ describe('Sidebar', () => {
       <Sidebar
         nodes={[createFile('readme.md')]}
         onCreateFile={onCreateFile}
+        onDeleteFile={vi.fn()}
         onFileSelect={vi.fn()}
         onNodesChange={vi.fn()}
         rootHandle={rootHandle}
@@ -268,6 +275,7 @@ describe('Sidebar', () => {
       <Sidebar
         nodes={[docsDir]}
         onCreateFile={onCreateFile}
+        onDeleteFile={vi.fn()}
         onFileSelect={vi.fn()}
         onNodesChange={vi.fn()}
         rootHandle={rootHandle}
@@ -282,5 +290,30 @@ describe('Sidebar', () => {
     await waitFor(() => {
       expect(onCreateFile).toHaveBeenCalledWith(expect.objectContaining({ path: 'docs' }), 'notes.md');
     });
+  });
+
+  it('shows a delete control for files and calls onDeleteFile without selecting the file', async () => {
+    const readmeNode = createFile('readme.md');
+    const onDeleteFile = vi.fn().mockResolvedValue(undefined);
+    const onFileSelect = vi.fn();
+
+    render(
+      <Sidebar
+        nodes={[readmeNode]}
+        onCreateFile={vi.fn()}
+        onDeleteFile={onDeleteFile}
+        onFileSelect={onFileSelect}
+        onNodesChange={vi.fn()}
+        rootHandle={rootHandle}
+      />
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Delete readme.md' }));
+
+    await waitFor(() => {
+      expect(onDeleteFile).toHaveBeenCalledWith(expect.objectContaining({ path: 'readme.md' }));
+    });
+
+    expect(onFileSelect).not.toHaveBeenCalled();
   });
 });

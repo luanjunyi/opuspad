@@ -126,6 +126,18 @@ export default function App() {
     return createdNode;
   }, [handleFileSelect, rootHandle]);
 
+  const handleDeleteFile = useCallback(async (node: FileNode) => {
+    if (!rootHandle || node.kind !== 'file') {
+      return;
+    }
+
+    const fsService = getFileSystemService();
+    await fsService.deleteFile(rootHandle, node.path);
+
+    setNodes((currentNodes) => removeNodeByPath(currentNodes, node.path));
+    setActiveFile((current) => (current?.node.path === node.path ? null : current));
+  }, [rootHandle]);
+
   const handleSave = useCallback(async (content: string) => {
     const currentActiveFile = activeFileRef.current;
     if (!currentActiveFile) return;
@@ -176,6 +188,54 @@ export default function App() {
     editVersionRef.current += 1;
     setSaveStatus('dirty');
   }, []);
+
+  const handleReloadWorkspace = useCallback(async () => {
+    if (!rootHandle) {
+      return;
+    }
+
+    try {
+      const fsService = getFileSystemService();
+      const refreshedNodes = await refreshLoadedWorkspaceNodes(rootHandle, nodes, fsService);
+      setNodes(refreshedNodes);
+
+      const currentActiveFile = activeFileRef.current;
+      if (
+        !currentActiveFile ||
+        currentActiveFile.state.kind !== 'text' ||
+        saveStatus !== 'saved' ||
+        !currentActiveFile.node.handle
+      ) {
+        return;
+      }
+
+      const refreshedState = await fsService.readEditableFile(
+        currentActiveFile.node.handle as FileSystemFileHandle,
+        currentActiveFile.node.path
+      );
+
+      setActiveFile((current) => {
+        if (
+          !current ||
+          current.node.path !== currentActiveFile.node.path ||
+          saveStatus !== 'saved'
+        ) {
+          return current;
+        }
+
+        if (areLoadFileResultsEqual(current.state, refreshedState)) {
+          return current;
+        }
+
+        return {
+          ...current,
+          state: refreshedState,
+        };
+      });
+    } catch (error) {
+      console.error('Workspace reload failed:', error);
+    }
+  }, [nodes, rootHandle, saveStatus]);
 
   const renderSaveIndicator = () => {
     if (!activeFile || activeFile.state.kind !== 'text') {
@@ -291,6 +351,7 @@ export default function App() {
           <Sidebar 
             nodes={nodes} 
             onCreateFile={handleCreateFile}
+            onDeleteFile={handleDeleteFile}
             onFileSelect={handleFileSelect} 
             onNodesChange={setNodes}
             rootHandle={rootHandle}
@@ -306,6 +367,15 @@ export default function App() {
             tabIndex={0}
           />
           <main className="workspace-main">
+            <div className="workspace-toolbar">
+              <button
+                className="ghost-button workspace-toolbar__button"
+                onClick={handleReloadWorkspace}
+                type="button"
+              >
+                Reload workspace
+              </button>
+            </div>
             {activeFile ? (
               <div className="editor-panel">
                 <header className="editor-panel__header">
@@ -342,4 +412,95 @@ export default function App() {
       )}
     </div>
   );
+}
+
+function removeNodeByPath(nodes: FileNode[], path: string): FileNode[] {
+  return nodes
+    .filter((node) => node.path !== path)
+    .map((node) => {
+      if (!node.children) {
+        return node;
+      }
+
+      return {
+        ...node,
+        children: removeNodeByPath(node.children, path),
+      };
+    });
+}
+
+async function refreshLoadedWorkspaceNodes(
+  rootHandle: FileSystemDirectoryHandle,
+  currentNodes: FileNode[],
+  fsService: ReturnType<typeof getFileSystemService>
+): Promise<FileNode[]> {
+  const latestNodes = await fsService.readDirectory(rootHandle);
+  return mergeLoadedDirectoryNodes(currentNodes, latestNodes, fsService);
+}
+
+async function mergeLoadedDirectoryNodes(
+  previousNodes: FileNode[],
+  nextNodes: FileNode[],
+  fsService: ReturnType<typeof getFileSystemService>
+): Promise<FileNode[]> {
+  const previousByPath = new Map(previousNodes.map((node) => [node.path, node]));
+  const mergedNodes = await Promise.all(
+    nextNodes.map(async (node) => {
+      if (node.kind !== 'directory' || !node.handle) {
+        return node;
+      }
+
+      const previousNode = previousByPath.get(node.path);
+      if (!previousNode || previousNode.kind !== 'directory' || !previousNode.childrenLoaded) {
+        return node;
+      }
+
+      const latestChildren = await fsService.readDirectory(
+        node.handle as FileSystemDirectoryHandle,
+        node.path
+      );
+      const mergedChildren = await mergeLoadedDirectoryNodes(
+        previousNode.children ?? [],
+        latestChildren,
+        fsService
+      );
+
+      return {
+        ...node,
+        childrenLoaded: true,
+        children: mergedChildren,
+      };
+    })
+  );
+
+  return mergedNodes;
+}
+
+function areLoadFileResultsEqual(left: ActiveFile['state'], right: ActiveFile['state']): boolean {
+  if (left.kind !== right.kind) {
+    return false;
+  }
+
+  if (left.path !== right.path) {
+    return false;
+  }
+
+  if (left.kind === 'error' && right.kind === 'error') {
+    return (
+      left.reason === right.reason &&
+      left.message === right.message
+    );
+  }
+
+  if (left.kind === 'text' && right.kind === 'text') {
+    return (
+      left.content === right.content &&
+      left.editor === right.editor &&
+      left.warning === right.warning &&
+      left.canOpenInRichMode === right.canOpenInRichMode &&
+      left.canOpenInSourceMode === right.canOpenInSourceMode
+    );
+  }
+
+  return false;
 }

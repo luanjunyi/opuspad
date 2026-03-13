@@ -60,4 +60,17 @@ describe('MockFileSystemService', () => {
     const topLevelNodes = await service.readDirectory({} as FileSystemDirectoryHandle);
     expect(topLevelNodes.some((node) => node.path === 'draft.md')).toBe(false);
   });
+
+  it('deletes files at their nested path instead of from the root', async () => {
+    const service = new MockFileSystemService({
+      docs: {
+        'draft.md': 'Draft',
+      },
+    });
+
+    await service.deleteFile({} as FileSystemDirectoryHandle, 'docs/draft.md');
+
+    const docsNodes = await service.readDirectory({} as FileSystemDirectoryHandle, 'docs');
+    expect(docsNodes.some((node) => node.path === 'docs/draft.md')).toBe(false);
+  });
 });

@@ -105,6 +105,29 @@ export const BrowserFileSystemService: FileSystemService = {
     };
   },
 
+  async deleteFile(rootHandle: FileSystemDirectoryHandle, path: string): Promise<void> {
+    const parts = path.split('/').filter(Boolean);
+    const fileName = parts.pop();
+
+    if (!fileName) {
+      throw new Error('File path is required');
+    }
+
+    const hasPermission = await this.ensurePermission(rootHandle, 'readwrite');
+    if (!hasPermission) {
+      throw new Error('Permission denied to delete file');
+    }
+
+    let directoryHandle = rootHandle;
+    for (const part of parts) {
+      // @ts-ignore - getDirectoryHandle is part of FileSystemDirectoryHandle
+      directoryHandle = await directoryHandle.getDirectoryHandle(part);
+    }
+
+    // @ts-ignore - removeEntry is part of FileSystemDirectoryHandle
+    await directoryHandle.removeEntry(fileName);
+  },
+
   async readEditableFile(fileHandle: FileSystemFileHandle, path: string): Promise<LoadFileResult> {
     try {
       const hasPermission = await this.ensurePermission(fileHandle, 'read');

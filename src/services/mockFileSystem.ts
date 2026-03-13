@@ -1195,6 +1195,34 @@ export class MockFileSystemService implements FileSystemService {
     };
   }
 
+  async deleteFile(_rootHandle: FileSystemDirectoryHandle, path: string): Promise<void> {
+    const parts = path.split('/').filter(Boolean);
+    if (parts.length === 0) {
+      throw new Error('File path is required');
+    }
+
+    let current: MockFileSystemTree = this.fileSystem;
+    for (const part of parts.slice(0, -1)) {
+      const next = current[part];
+      if (!this.isDirectoryEntry(next)) {
+        throw new Error('Parent directory not found');
+      }
+
+      current = next;
+    }
+
+    const leaf = parts[parts.length - 1];
+    if (this.isDirectoryEntry(current[leaf])) {
+      throw new Error('Cannot delete a directory with deleteFile');
+    }
+
+    if (current[leaf] === undefined) {
+      throw new Error('Not found');
+    }
+
+    delete current[leaf];
+  }
+
   async readDirectory(dirHandle: FileSystemDirectoryHandle, currentPath: string = ''): Promise<FileNode[]> {
     const parts = currentPath ? currentPath.split('/') : [];
     let current;

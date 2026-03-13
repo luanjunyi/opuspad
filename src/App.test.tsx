@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, createEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, createEvent, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
@@ -11,6 +11,7 @@ const mockFsService = {
   readDirectory: vi.fn(),
   readEditableFile: vi.fn(),
   createFile: vi.fn(),
+  deleteFile: vi.fn(),
   writeFile: vi.fn(),
 };
 
@@ -47,12 +48,15 @@ vi.mock('./services', () => ({
 }));
 
 vi.mock('./components/Sidebar', () => ({
-  Sidebar: ({ nodes, onFileSelect, onCreateFile }: any) => (
+  Sidebar: ({ nodes, onFileSelect, onCreateFile, onDeleteFile }: any) => (
     <div>
       {nodes.map((node: FileNode) => (
-        <button key={node.path} onClick={() => onFileSelect(node)}>
-          {node.name}
-        </button>
+        <div key={node.path}>
+          <button onClick={() => onFileSelect(node)}>{node.name}</button>
+          {node.kind === 'file' ? (
+            <button onClick={() => onDeleteFile(node)}>Delete {node.name}</button>
+          ) : null}
+        </div>
       ))}
       <button onClick={() => onCreateFile(null, 'root.md')}>New File In Root</button>
       {nodes
@@ -70,6 +74,9 @@ vi.mock('./components/EditorRouter', () => ({
   EditorRouter: ({ activeFile, onDirty, onSave }: any) => (
     <div>
       <div data-testid="active-path">{activeFile.node.path}</div>
+      {activeFile.state.kind === 'text' ? (
+        <div data-testid="active-content">{activeFile.state.content}</div>
+      ) : null}
       <button onClick={() => onDirty()}>Dirty</button>
       <button onClick={() => onSave(`saved:${activeFile.node.path}`)}>Save</button>
     </div>
@@ -90,6 +97,7 @@ describe('App', () => {
     mockFsService.createFile.mockImplementation((_handle: unknown, currentPath: string, name: string) =>
       Promise.resolve(createFileNode(currentPath ? `${currentPath}/${name}` : name))
     );
+    mockFsService.deleteFile.mockResolvedValue(undefined);
     mockFsService.writeFile.mockResolvedValue(undefined);
     window.history.replaceState({}, '', '/');
   });
@@ -226,6 +234,25 @@ describe('App', () => {
     });
   });
 
+  it('deletes a file from the workspace and clears the editor when that file was open', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Open Folder' }));
+    await screen.findByRole('button', { name: alphaNode.name });
+
+    await user.click(screen.getByRole('button', { name: alphaNode.name }));
+    await waitFor(() => {
+      expect(screen.getByTestId('active-path')).toHaveTextContent(alphaNode.path);
+    });
+
+    await user.click(screen.getByRole('button', { name: `Delete ${alphaNode.name}` }));
+
+    expect(mockFsService.deleteFile).toHaveBeenCalledWith(rootHandle, alphaNode.path);
+    expect(screen.queryByTestId('active-path')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: alphaNode.name })).not.toBeInTheDocument();
+  });
+
   it('lets the user resize the sidebar by dragging the divider', async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -254,5 +281,47 @@ describe('App', () => {
     window.dispatchEvent(saveEvent);
 
     expect(saveEvent.defaultPrevented).toBe(true);
+  });
+
+  it('reloads the active file when requested and there are no local edits', async () => {
+    mockFsService.readEditableFile
+      .mockResolvedValueOnce(createTextState(alphaNode.path, 'alpha'))
+      .mockResolvedValueOnce(createTextState(alphaNode.path, 'alpha updated elsewhere'));
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Open Folder' }));
+    await screen.findByRole('button', { name: alphaNode.name });
+    await user.click(screen.getByRole('button', { name: alphaNode.name }));
+
+    expect(screen.getByTestId('active-content')).toHaveTextContent('alpha');
+
+    await user.click(screen.getByRole('button', { name: 'Reload workspace' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('active-content')).toHaveTextContent('alpha updated elsewhere');
+    });
+  });
+
+  it('reloads the mounted tree when files are added externally', async () => {
+    const gammaNode = createFileNode('gamma.txt');
+    mockFsService.readDirectory
+      .mockResolvedValueOnce([alphaNode, betaNode])
+      .mockResolvedValueOnce([alphaNode, betaNode, gammaNode]);
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Open Folder' }));
+    await screen.findByRole('button', { name: alphaNode.name });
+    expect(screen.getByRole('button', { name: alphaNode.name })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: gammaNode.name })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Reload workspace' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: gammaNode.name })).toBeInTheDocument();
+    });
   });
 });
