@@ -13,6 +13,7 @@ export default function App() {
   const [rootHandle, setRootHandle] = useState<FileSystemDirectoryHandle | null>(null);
   const [nodes, setNodes] = useState<FileNode[]>([]);
   const [activeFile, setActiveFile] = useState<ActiveFile | null>(null);
+  const [activeFileReloadNonce, setActiveFileReloadNonce] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [permissionError, setPermissionError] = useState<boolean>(false);
   const latestFileSelectionId = useRef(0);
@@ -110,6 +111,7 @@ export default function App() {
       }
       return { node, state };
     });
+    setActiveFileReloadNonce(0);
   }, []);
 
   const handleCreateFile = useCallback(async (directory: FileNode | null, rawName: string) => {
@@ -214,6 +216,10 @@ export default function App() {
         currentActiveFile.node.path
       );
 
+      if (areLoadFileResultsEqual(currentActiveFile.state, refreshedState)) {
+        return;
+      }
+
       setActiveFile((current) => {
         if (
           !current ||
@@ -232,6 +238,7 @@ export default function App() {
           state: refreshedState,
         };
       });
+      setActiveFileReloadNonce((current) => current + 1);
     } catch (error) {
       console.error('Workspace reload failed:', error);
     }
@@ -393,6 +400,7 @@ export default function App() {
                 <div className="editor-panel__body">
                   <EditorRouter
                     activeFile={activeFile}
+                    reloadNonce={activeFileReloadNonce}
                     onSave={handleSave}
                     onDirty={handleDirty}
                     onOpenInSourceMode={openInSourceMode}

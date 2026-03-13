@@ -244,6 +244,40 @@ describe('MarkdownEditor', () => {
     expect(screen.getByTestId('blocknote-view')).toHaveTextContent('editor-1');
   });
 
+  it('recreates the editor when the current markdown file is explicitly reloaded', async () => {
+    const firstEditor = createMockEditor('editor-1', Promise.resolve([{ type: 'paragraph' }]));
+    const secondEditor = createMockEditor('editor-2', Promise.resolve([{ type: 'heading' }]));
+    blockNoteCreate.mockReturnValueOnce(firstEditor).mockReturnValueOnce(secondEditor);
+
+    const { rerender } = render(
+      <MarkdownEditor
+        activeFile={createActiveFile('notes.md', '# hello')}
+        reloadNonce={0}
+        onSave={vi.fn()}
+        onDirty={vi.fn()}
+        onOpenInSourceMode={vi.fn()}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('blocknote-view')).toHaveTextContent('editor-1');
+    });
+
+    rerender(
+      <MarkdownEditor
+        activeFile={createActiveFile('notes.md', '# updated')}
+        reloadNonce={1}
+        onSave={vi.fn()}
+        onDirty={vi.fn()}
+        onOpenInSourceMode={vi.fn()}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('blocknote-view')).toHaveTextContent('editor-2');
+    });
+  });
+
   it('keeps space input working inside the rich editor content', async () => {
     const editor = createMockEditor('editor-1', Promise.resolve([{ type: 'paragraph' }]));
     blockNoteCreate.mockReturnValue(editor);

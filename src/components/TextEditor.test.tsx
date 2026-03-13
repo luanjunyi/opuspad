@@ -113,4 +113,28 @@ describe('TextEditor', () => {
 
     expect(screen.getByTestId('code-editor')).toHaveValue('hello world');
   });
+
+  it('adopts reloaded content for the current file when a reload is requested', () => {
+    const { rerender } = render(
+      <TextEditor
+        activeFile={createActiveFile('notes.md', 'hello')}
+        reloadNonce={0}
+        onSave={vi.fn()}
+        onDirty={vi.fn()}
+        onOpenInRichMode={vi.fn()}
+      />
+    );
+
+    rerender(
+      <TextEditor
+        activeFile={createActiveFile('notes.md', 'hello from disk')}
+        reloadNonce={1}
+        onSave={vi.fn()}
+        onDirty={vi.fn()}
+        onOpenInRichMode={vi.fn()}
+      />
+    );
+
+    expect(screen.getByTestId('code-editor')).toHaveValue('hello from disk');
+  });
 });

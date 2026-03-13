@@ -9,12 +9,13 @@ import { getSourceLanguage } from '../utils/sourceLanguage';
 
 interface TextEditorProps {
   activeFile: ActiveFile;
+  reloadNonce?: number;
   onSave: (content: string) => void;
   onDirty: () => void;
   onOpenInRichMode: () => void;
 }
 
-export function TextEditor({ activeFile, onSave, onDirty, onOpenInRichMode }: TextEditorProps) {
+export function TextEditor({ activeFile, reloadNonce = 0, onSave, onDirty, onOpenInRichMode }: TextEditorProps) {
   const fileState = activeFile.state;
   
   if (fileState.kind === 'error') {
@@ -35,6 +36,7 @@ export function TextEditor({ activeFile, onSave, onDirty, onOpenInRichMode }: Te
   const savedContentRef = useRef(fileState.content);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previousPathRef = useRef(fileState.path);
+  const previousReloadNonceRef = useRef(reloadNonce);
 
   useEffect(() => {
     onSaveRef.current = onSave;
@@ -47,18 +49,26 @@ export function TextEditor({ activeFile, onSave, onDirty, onOpenInRichMode }: Te
   useEffect(() => {
     savedContentRef.current = fileState.content;
     const pathChanged = previousPathRef.current !== fileState.path;
+    const reloadRequested = previousReloadNonceRef.current !== reloadNonce;
 
-    if (pathChanged) {
+    if (pathChanged || reloadRequested) {
       previousPathRef.current = fileState.path;
+      previousReloadNonceRef.current = reloadNonce;
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+        saveTimeoutRef.current = null;
+      }
       latestContentRef.current = fileState.content;
       setContent(fileState.content);
       return;
     }
 
+    previousReloadNonceRef.current = reloadNonce;
+
     if (latestContentRef.current === fileState.content) {
       setContent(fileState.content);
     }
-  }, [fileState.path, fileState.content]);
+  }, [fileState.path, fileState.content, reloadNonce]);
 
   // Debounced save
   useEffect(() => {

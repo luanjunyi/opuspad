@@ -9,12 +9,19 @@ import { shouldPreventEditorPageScroll } from "../utils/editorKeyboard";
 
 interface MarkdownEditorProps {
   activeFile: ActiveFile;
+  reloadNonce?: number;
   onSave: (content: string) => void;
   onDirty: () => void;
   onOpenInSourceMode: () => void;
 }
 
-export function MarkdownEditor({ activeFile, onSave, onDirty, onOpenInSourceMode }: MarkdownEditorProps) {
+export function MarkdownEditor({
+  activeFile,
+  reloadNonce = 0,
+  onSave,
+  onDirty,
+  onOpenInSourceMode,
+}: MarkdownEditorProps) {
   const [editor, setEditor] = useState<BlockNoteEditor | null>(null);
   const latestLoadId = useRef(0);
   const editorRef = useRef<BlockNoteEditor | null>(null);
@@ -67,7 +74,7 @@ export function MarkdownEditor({ activeFile, onSave, onDirty, onOpenInSourceMode
       }
       editorRef.current = null;
     };
-  }, [activeFile.node.path]); // Re-load if path changes
+  }, [activeFile.node.path, reloadNonce]); // Re-load if the file changes or a same-file reload is requested
 
   const handleChange = useCallback(() => {
     if (!editor) return;
