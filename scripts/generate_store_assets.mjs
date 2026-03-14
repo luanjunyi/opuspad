@@ -7,7 +7,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
-const iconPath = `file://${path.join(rootDir, 'public', 'icon128.png')}`;
+const iconData = fs.readFileSync(path.join(rootDir, 'public', 'icon128.png'));
+const iconBase64 = iconData.toString('base64');
+const iconPath = `data:image/png;base64,${iconBase64}`;
 
 const assets = [
   {
