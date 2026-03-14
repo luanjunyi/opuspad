@@ -43,6 +43,16 @@ function createTextState(path: string, content: string): LoadFileResult {
   };
 }
 
+function createMarkdownState(path: string, content: string): LoadFileResult {
+  return {
+    kind: 'text',
+    path,
+    content,
+    editor: 'markdown',
+    canOpenInSourceMode: true,
+  };
+}
+
 vi.mock('./services', () => ({
   getFileSystemService: () => mockFsService,
 }));
@@ -100,12 +110,37 @@ describe('App', () => {
     mockFsService.deleteFile.mockResolvedValue(undefined);
     mockFsService.writeFile.mockResolvedValue(undefined);
     window.history.replaceState({}, '', '/');
+    document.title = 'OpusPad';
   });
 
   it('renders headline', () => {
     render(<App />);
     expect(screen.getByText('OpusPad')).toBeInTheDocument();
     expect(screen.getByText('Bridging AI output and human intent, WYSIWYG, private, local only.')).toBeInTheDocument();
+    expect(document.title).toBe('OpusPad');
+  });
+
+  it('updates the document title to the workspace name when a folder is open but no file is selected', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Open Folder' }));
+    await screen.findByRole('button', { name: alphaNode.name });
+
+    expect(document.title).toBe('root');
+  });
+
+  it('updates the document title to the workspace name and active file name', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Open Folder' }));
+    await screen.findByRole('button', { name: alphaNode.name });
+    await user.click(screen.getByRole('button', { name: alphaNode.name }));
+
+    await waitFor(() => {
+      expect(document.title).toBe('root/alpha.txt');
+    });
   });
 
   it('ignores stale file-load results when a newer selection finishes first', async () => {
@@ -283,45 +318,77 @@ describe('App', () => {
     expect(saveEvent.defaultPrevented).toBe(true);
   });
 
-  it('reloads the active file when requested and there are no local edits', async () => {
+  it('auto reloads the active file every 2 seconds when there are no local edits', async () => {
+    vi.useFakeTimers();
     mockFsService.readEditableFile
       .mockResolvedValueOnce(createTextState(alphaNode.path, 'alpha'))
       .mockResolvedValueOnce(createTextState(alphaNode.path, 'alpha updated elsewhere'));
 
-    const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByRole('button', { name: 'Open Folder' }));
-    await screen.findByRole('button', { name: alphaNode.name });
-    await user.click(screen.getByRole('button', { name: alphaNode.name }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Open Folder' }));
+      await Promise.resolve();
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: alphaNode.name }));
+      await Promise.resolve();
+    });
 
     expect(screen.getByTestId('active-content')).toHaveTextContent('alpha');
 
-    await user.click(screen.getByRole('button', { name: 'Reload workspace' }));
-
-    await waitFor(() => {
-      expect(screen.getByTestId('active-content')).toHaveTextContent('alpha updated elsewhere');
+    await act(async () => {
+      vi.advanceTimersByTime(2000);
+      await Promise.resolve();
     });
+
+    expect(screen.getByTestId('active-content')).toHaveTextContent('alpha updated elsewhere');
+    vi.useRealTimers();
   });
 
-  it('reloads the mounted tree when files are added externally', async () => {
+  it('auto reloads the mounted tree every 2 seconds when files are added externally', async () => {
+    vi.useFakeTimers();
     const gammaNode = createFileNode('gamma.txt');
     mockFsService.readDirectory
       .mockResolvedValueOnce([alphaNode, betaNode])
       .mockResolvedValueOnce([alphaNode, betaNode, gammaNode]);
 
+    render(<App />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Open Folder' }));
+      await Promise.resolve();
+    });
+
+    expect(screen.getByRole('button', { name: alphaNode.name })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: gammaNode.name })).not.toBeInTheDocument();
+
+    await act(async () => {
+      vi.advanceTimersByTime(2000);
+      await Promise.resolve();
+    });
+
+    expect(screen.getByRole('button', { name: gammaNode.name })).toBeInTheDocument();
+    vi.useRealTimers();
+  });
+
+  it('renders the mode toggle before the reload button in the sticky toolbar', async () => {
+    mockFsService.readEditableFile.mockResolvedValue(createMarkdownState('notes.md', '# notes'));
+    mockFsService.readDirectory.mockResolvedValue([createFileNode('notes.md')]);
+
     const user = userEvent.setup();
     render(<App />);
 
     await user.click(screen.getByRole('button', { name: 'Open Folder' }));
-    await screen.findByRole('button', { name: alphaNode.name });
-    expect(screen.getByRole('button', { name: alphaNode.name })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: gammaNode.name })).not.toBeInTheDocument();
+    await screen.findByRole('button', { name: 'notes.md' });
+    await user.click(screen.getByRole('button', { name: 'notes.md' }));
 
-    await user.click(screen.getByRole('button', { name: 'Reload workspace' }));
+    const openSourceButton = await screen.findByRole('button', { name: 'Open source' });
+    const reloadButton = screen.getByRole('button', { name: 'Reload workspace' });
 
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: gammaNode.name })).toBeInTheDocument();
-    });
+    expect(
+      openSourceButton.compareDocumentPosition(reloadButton) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
   });
 });

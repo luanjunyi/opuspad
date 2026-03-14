@@ -42,7 +42,7 @@ describe('TextEditor', () => {
       node: { name: 'img.png', kind: 'file', path: 'img.png', handle: null },
       state: { kind: 'error', path: 'img.png', reason: 'binary', message: 'Binary files cannot be edited' }
     };
-    render(<TextEditor activeFile={activeFile} onSave={vi.fn()} onDirty={vi.fn()} onOpenInRichMode={vi.fn()} />);
+    render(<TextEditor activeFile={activeFile} onSave={vi.fn()} onDirty={vi.fn()} />);
     expect(screen.getByText('Unsupported File')).toBeInTheDocument();
     expect(screen.getByText('Binary files cannot be edited')).toBeInTheDocument();
   });
@@ -52,7 +52,7 @@ describe('TextEditor', () => {
       node: { name: 'notes.md', kind: 'file', path: 'notes.md', handle: null },
       state: { kind: 'text', path: 'notes.md', content: 'test', editor: 'text', warning: 'Markdown warning', canOpenInRichMode: true }
     };
-    render(<TextEditor activeFile={activeFile} onSave={vi.fn()} onDirty={vi.fn()} onOpenInRichMode={vi.fn()} />);
+    render(<TextEditor activeFile={activeFile} onSave={vi.fn()} onDirty={vi.fn()} />);
     expect(screen.getByText(/Markdown warning/)).toBeInTheDocument();
   });
 
@@ -60,7 +60,7 @@ describe('TextEditor', () => {
     vi.useFakeTimers();
     const onSave = vi.fn();
     const { unmount } = render(
-      <TextEditor activeFile={createActiveFile('notes.md', 'hello')} onSave={onSave} onDirty={vi.fn()} onOpenInRichMode={vi.fn()} />
+      <TextEditor activeFile={createActiveFile('notes.md', 'hello')} onSave={onSave} onDirty={vi.fn()} />
     );
 
     fireEvent.change(screen.getByTestId('code-editor'), { target: { value: 'hello world' } });
@@ -77,7 +77,7 @@ describe('TextEditor', () => {
   });
 
   it('keeps space input working inside the source editor content', () => {
-    render(<TextEditor activeFile={createActiveFile('notes.md', 'hello')} onSave={vi.fn()} onDirty={vi.fn()} onOpenInRichMode={vi.fn()} />);
+    render(<TextEditor activeFile={createActiveFile('notes.md', 'hello')} onSave={vi.fn()} onDirty={vi.fn()} />);
 
     const spaceEvent = createEvent.keyDown(screen.getByTestId('code-editor'), { key: ' ' });
     fireEvent(screen.getByTestId('code-editor'), spaceEvent);
@@ -97,7 +97,7 @@ describe('TextEditor', () => {
 
   it('does not overwrite newer local edits when saved content arrives for the same file', () => {
     const { rerender } = render(
-      <TextEditor activeFile={createActiveFile('notes.md', 'hello')} onSave={vi.fn()} onDirty={vi.fn()} onOpenInRichMode={vi.fn()} />
+      <TextEditor activeFile={createActiveFile('notes.md', 'hello')} onSave={vi.fn()} onDirty={vi.fn()} />
     );
 
     fireEvent.change(screen.getByTestId('code-editor'), { target: { value: 'hello world' } });
@@ -107,7 +107,6 @@ describe('TextEditor', () => {
         activeFile={createActiveFile('notes.md', 'hello')}
         onSave={vi.fn()}
         onDirty={vi.fn()}
-        onOpenInRichMode={vi.fn()}
       />
     );
 
@@ -121,7 +120,6 @@ describe('TextEditor', () => {
         reloadNonce={0}
         onSave={vi.fn()}
         onDirty={vi.fn()}
-        onOpenInRichMode={vi.fn()}
       />
     );
 
@@ -131,7 +129,6 @@ describe('TextEditor', () => {
         reloadNonce={1}
         onSave={vi.fn()}
         onDirty={vi.fn()}
-        onOpenInRichMode={vi.fn()}
       />
     );
 

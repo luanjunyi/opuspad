@@ -12,10 +12,9 @@ interface TextEditorProps {
   reloadNonce?: number;
   onSave: (content: string) => void;
   onDirty: () => void;
-  onOpenInRichMode: () => void;
 }
 
-export function TextEditor({ activeFile, reloadNonce = 0, onSave, onDirty, onOpenInRichMode }: TextEditorProps) {
+export function TextEditor({ activeFile, reloadNonce = 0, onSave, onDirty }: TextEditorProps) {
   const fileState = activeFile.state;
   
   if (fileState.kind === 'error') {
@@ -140,11 +139,6 @@ export function TextEditor({ activeFile, reloadNonce = 0, onSave, onDirty, onOpe
             <p className="editor-warning__eyebrow">Source mode recommended</p>
             <p className="editor-warning__text">{fileState.warning}</p>
           </div>
-          {fileState.canOpenInRichMode && (
-            <button className="ghost-button" onClick={onOpenInRichMode} type="button">
-              Open rich editor
-            </button>
-          )}
         </div>
       )}
       <div className="code-editor-shell">

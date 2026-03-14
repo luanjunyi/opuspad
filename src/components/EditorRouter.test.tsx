@@ -15,7 +15,7 @@ describe('EditorRouter', () => {
       node: { name: 'test.json', kind: 'file', path: 'test.json', handle: null },
       state: { kind: 'text', path: 'test.json', content: 'test', editor: 'text' }
     };
-    render(<EditorRouter activeFile={file} reloadNonce={0} onSave={vi.fn()} onDirty={vi.fn()} onOpenInSourceMode={vi.fn()} onOpenInRichMode={vi.fn()} />);
+    render(<EditorRouter activeFile={file} reloadNonce={0} onSave={vi.fn()} onDirty={vi.fn()} />);
     expect(screen.getByRole('textbox')).toBeInTheDocument(); // CodeMirror uses role=textbox
   });
 
@@ -24,7 +24,7 @@ describe('EditorRouter', () => {
       node: { name: 'test.md', kind: 'file', path: 'test.md', handle: null },
       state: { kind: 'text', path: 'test.md', content: '# test', editor: 'markdown' }
     };
-    render(<EditorRouter activeFile={file} reloadNonce={0} onSave={vi.fn()} onDirty={vi.fn()} onOpenInSourceMode={vi.fn()} onOpenInRichMode={vi.fn()} />);
+    render(<EditorRouter activeFile={file} reloadNonce={0} onSave={vi.fn()} onDirty={vi.fn()} />);
     expect(screen.getByTestId('markdown-editor')).toBeInTheDocument();
   });
 
@@ -40,7 +40,7 @@ describe('EditorRouter', () => {
         canOpenInSourceMode: true,
       }
     };
-    render(<EditorRouter activeFile={file} reloadNonce={0} onSave={vi.fn()} onDirty={vi.fn()} onOpenInSourceMode={vi.fn()} onOpenInRichMode={vi.fn()} />);
+    render(<EditorRouter activeFile={file} reloadNonce={0} onSave={vi.fn()} onDirty={vi.fn()} />);
     expect(screen.getByTestId('markdown-editor')).toBeInTheDocument();
   });
 });

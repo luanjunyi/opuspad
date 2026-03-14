@@ -12,7 +12,6 @@ interface MarkdownEditorProps {
   reloadNonce?: number;
   onSave: (content: string) => void;
   onDirty: () => void;
-  onOpenInSourceMode: () => void;
 }
 
 export function MarkdownEditor({
@@ -20,7 +19,6 @@ export function MarkdownEditor({
   reloadNonce = 0,
   onSave,
   onDirty,
-  onOpenInSourceMode,
 }: MarkdownEditorProps) {
   const [editor, setEditor] = useState<BlockNoteEditor | null>(null);
   const latestLoadId = useRef(0);
@@ -111,11 +109,6 @@ export function MarkdownEditor({
             <p className="editor-warning__eyebrow">Rich preview, careful save</p>
             <p className="editor-warning__text">{activeFile.state.warning}</p>
           </div>
-          {activeFile.state.canOpenInSourceMode && (
-            <button className="ghost-button" onClick={onOpenInSourceMode} type="button">
-              Open source
-            </button>
-          )}
         </div>
       )}
       <BlockNoteView

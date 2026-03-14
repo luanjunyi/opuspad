@@ -90,7 +90,7 @@ describe('MarkdownEditor', () => {
     blockNoteCreate.mockReturnValue(editor);
     const onSave = vi.fn();
 
-    render(<MarkdownEditor activeFile={createActiveFile('notes.md', '# hello')} onSave={onSave} onDirty={vi.fn()} onOpenInSourceMode={vi.fn()} />);
+    render(<MarkdownEditor activeFile={createActiveFile('notes.md', '# hello')} onSave={onSave} onDirty={vi.fn()} />);
 
     await act(async () => {
       await Promise.resolve();
@@ -127,7 +127,6 @@ describe('MarkdownEditor', () => {
         activeFile={createActiveFile('notes.md', '# hello')}
         onSave={onSave}
         onDirty={vi.fn()}
-        onOpenInSourceMode={vi.fn()}
       />
     );
 
@@ -159,7 +158,6 @@ describe('MarkdownEditor', () => {
         activeFile={createActiveFile('first.md', '# first')}
         onSave={vi.fn()}
         onDirty={vi.fn()}
-        onOpenInSourceMode={vi.fn()}
       />
     );
 
@@ -167,7 +165,7 @@ describe('MarkdownEditor', () => {
       expect(screen.getByTestId('blocknote-view')).toHaveTextContent('editor-1');
     });
 
-    rerender(<MarkdownEditor activeFile={createActiveFile('second.md', '# second')} onSave={vi.fn()} onDirty={vi.fn()} onOpenInSourceMode={vi.fn()} />);
+    rerender(<MarkdownEditor activeFile={createActiveFile('second.md', '# second')} onSave={vi.fn()} onDirty={vi.fn()} />);
 
     await waitFor(() => {
       expect(screen.getByText('Loading editor...')).toBeInTheDocument();
@@ -195,11 +193,10 @@ describe('MarkdownEditor', () => {
         activeFile={createActiveFile('first.md', '# first')}
         onSave={vi.fn()}
         onDirty={vi.fn()}
-        onOpenInSourceMode={vi.fn()}
       />
     );
 
-    rerender(<MarkdownEditor activeFile={createActiveFile('second.md', '# second')} onSave={vi.fn()} onDirty={vi.fn()} onOpenInSourceMode={vi.fn()} />);
+    rerender(<MarkdownEditor activeFile={createActiveFile('second.md', '# second')} onSave={vi.fn()} onDirty={vi.fn()} />);
 
     await waitFor(() => {
       expect(screen.getByTestId('blocknote-view')).toHaveTextContent('editor-2');
@@ -223,7 +220,6 @@ describe('MarkdownEditor', () => {
         activeFile={createActiveFile('notes.md', '# hello')}
         onSave={vi.fn()}
         onDirty={vi.fn()}
-        onOpenInSourceMode={vi.fn()}
       />
     );
 
@@ -236,7 +232,6 @@ describe('MarkdownEditor', () => {
         activeFile={createActiveFile('notes.md', '# hello')}
         onSave={vi.fn()}
         onDirty={vi.fn()}
-        onOpenInSourceMode={vi.fn()}
       />
     );
 
@@ -255,7 +250,6 @@ describe('MarkdownEditor', () => {
         reloadNonce={0}
         onSave={vi.fn()}
         onDirty={vi.fn()}
-        onOpenInSourceMode={vi.fn()}
       />
     );
 
@@ -269,7 +263,6 @@ describe('MarkdownEditor', () => {
         reloadNonce={1}
         onSave={vi.fn()}
         onDirty={vi.fn()}
-        onOpenInSourceMode={vi.fn()}
       />
     );
 
@@ -287,7 +280,6 @@ describe('MarkdownEditor', () => {
         activeFile={createActiveFile('notes.md', '# hello')}
         onSave={vi.fn()}
         onDirty={vi.fn()}
-        onOpenInSourceMode={vi.fn()}
       />
     );
 

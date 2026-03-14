@@ -8,8 +8,6 @@ interface EditorRouterProps {
   reloadNonce: number;
   onSave: (content: string) => void;
   onDirty: () => void;
-  onOpenInSourceMode: () => void;
-  onOpenInRichMode: () => void;
 }
 
 export function EditorRouter({
@@ -17,18 +15,16 @@ export function EditorRouter({
   reloadNonce,
   onSave,
   onDirty,
-  onOpenInSourceMode,
-  onOpenInRichMode,
 }: EditorRouterProps) {
   const { state } = activeFile;
 
   if (state.kind === 'error') {
-    return <TextEditor activeFile={activeFile} reloadNonce={reloadNonce} onSave={onSave} onDirty={onDirty} onOpenInRichMode={onOpenInRichMode} />;
+    return <TextEditor activeFile={activeFile} reloadNonce={reloadNonce} onSave={onSave} onDirty={onDirty} />;
   }
 
   if (state.editor === 'markdown') {
-    return <MarkdownEditor activeFile={activeFile} reloadNonce={reloadNonce} onSave={onSave} onDirty={onDirty} onOpenInSourceMode={onOpenInSourceMode} />;
+    return <MarkdownEditor activeFile={activeFile} reloadNonce={reloadNonce} onSave={onSave} onDirty={onDirty} />;
   }
 
-  return <TextEditor activeFile={activeFile} reloadNonce={reloadNonce} onSave={onSave} onDirty={onDirty} onOpenInRichMode={onOpenInRichMode} />;
+  return <TextEditor activeFile={activeFile} reloadNonce={reloadNonce} onSave={onSave} onDirty={onDirty} />;
 }

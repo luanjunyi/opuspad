@@ -8,6 +8,7 @@ import { applySavedTextFileState } from './utils/activeFileSave';
 const DEFAULT_SIDEBAR_WIDTH = 300;
 const MIN_SIDEBAR_WIDTH = 220;
 const MAX_SIDEBAR_WIDTH = 540;
+const WORKSPACE_RELOAD_INTERVAL_MS = 2000;
 
 export default function App() {
   const [rootHandle, setRootHandle] = useState<FileSystemDirectoryHandle | null>(null);
@@ -18,6 +19,9 @@ export default function App() {
   const [permissionError, setPermissionError] = useState<boolean>(false);
   const latestFileSelectionId = useRef(0);
   const activeFileRef = useRef<ActiveFile | null>(null);
+  const nodesRef = useRef<FileNode[]>([]);
+  const saveStatusRef = useRef<'idle' | 'dirty' | 'saving' | 'saved'>('idle');
+  const isReloadingWorkspaceRef = useRef(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'dirty' | 'saving' | 'saved'>('idle');
   const editVersionRef = useRef(0);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
@@ -26,6 +30,28 @@ export default function App() {
   useEffect(() => {
     activeFileRef.current = activeFile;
   }, [activeFile]);
+
+  useEffect(() => {
+    nodesRef.current = nodes;
+  }, [nodes]);
+
+  useEffect(() => {
+    saveStatusRef.current = saveStatus;
+  }, [saveStatus]);
+
+  useEffect(() => {
+    if (rootHandle && activeFile) {
+      document.title = `${rootHandle.name}/${activeFile.node.name}`;
+      return;
+    }
+
+    if (rootHandle) {
+      document.title = rootHandle.name;
+      return;
+    }
+
+    document.title = 'OpusPad';
+  }, [activeFile, rootHandle]);
 
   useEffect(() => {
     if (!activeFile || activeFile.state.kind !== 'text') {
@@ -191,21 +217,23 @@ export default function App() {
     setSaveStatus('dirty');
   }, []);
 
-  const handleReloadWorkspace = useCallback(async () => {
-    if (!rootHandle) {
+  const reloadWorkspace = useCallback(async (rootHandleToReload: FileSystemDirectoryHandle | null) => {
+    if (!rootHandleToReload || isReloadingWorkspaceRef.current) {
       return;
     }
 
+    isReloadingWorkspaceRef.current = true;
+
     try {
       const fsService = getFileSystemService();
-      const refreshedNodes = await refreshLoadedWorkspaceNodes(rootHandle, nodes, fsService);
+      const refreshedNodes = await refreshLoadedWorkspaceNodes(rootHandleToReload, nodesRef.current, fsService);
       setNodes(refreshedNodes);
 
       const currentActiveFile = activeFileRef.current;
       if (
         !currentActiveFile ||
         currentActiveFile.state.kind !== 'text' ||
-        saveStatus !== 'saved' ||
+        saveStatusRef.current !== 'saved' ||
         !currentActiveFile.node.handle
       ) {
         return;
@@ -224,7 +252,7 @@ export default function App() {
         if (
           !current ||
           current.node.path !== currentActiveFile.node.path ||
-          saveStatus !== 'saved'
+          saveStatusRef.current !== 'saved'
         ) {
           return current;
         }
@@ -241,8 +269,28 @@ export default function App() {
       setActiveFileReloadNonce((current) => current + 1);
     } catch (error) {
       console.error('Workspace reload failed:', error);
+    } finally {
+      isReloadingWorkspaceRef.current = false;
     }
-  }, [nodes, rootHandle, saveStatus]);
+  }, []);
+
+  const handleReloadWorkspace = useCallback(async () => {
+    await reloadWorkspace(rootHandle);
+  }, [reloadWorkspace, rootHandle]);
+
+  useEffect(() => {
+    if (!rootHandle) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      void reloadWorkspace(rootHandle);
+    }, WORKSPACE_RELOAD_INTERVAL_MS);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [reloadWorkspace, rootHandle]);
 
   const renderSaveIndicator = () => {
     if (!activeFile || activeFile.state.kind !== 'text') {
@@ -291,6 +339,22 @@ export default function App() {
       };
     });
   }, []);
+
+  const modeToggleButton = activeFile?.state.kind === 'text'
+    ? activeFile.state.editor === 'markdown' && activeFile.state.canOpenInSourceMode
+      ? (
+        <button className="ghost-button workspace-toolbar__button" onClick={openInSourceMode} type="button">
+          Open source
+        </button>
+      )
+      : activeFile.state.editor === 'text' && activeFile.state.canOpenInRichMode
+        ? (
+          <button className="ghost-button workspace-toolbar__button" onClick={openInRichMode} type="button">
+            Open rich
+          </button>
+        )
+        : null
+    : null;
 
   const isMock = new URLSearchParams(window.location.search).get('fs') === 'mock';
 
@@ -376,6 +440,7 @@ export default function App() {
           />
           <main className="workspace-main">
             <div className="workspace-toolbar">
+              {modeToggleButton}
               <button
                 className="ghost-button workspace-toolbar__button"
                 onClick={handleReloadWorkspace}
@@ -404,8 +469,6 @@ export default function App() {
                     reloadNonce={activeFileReloadNonce}
                     onSave={handleSave}
                     onDirty={handleDirty}
-                    onOpenInSourceMode={openInSourceMode}
-                    onOpenInRichMode={openInRichMode}
                   />
                 </div>
               </div>
