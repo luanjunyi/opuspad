@@ -44,9 +44,6 @@ function run() {
   const zipName = `${name}-v${newVersion}.zip`;
   const zipPath = path.join(rootDir, zipName);
 
-  console.log(`Building ${name} v${newVersion}...`);
-  execSync('npm run build', { cwd: rootDir, stdio: 'inherit' });
-
   console.log(`Creating zip file: ${zipName}...`);
   if (fs.existsSync(zipPath)) {
     fs.unlinkSync(zipPath);
