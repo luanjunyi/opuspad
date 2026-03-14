@@ -9,6 +9,7 @@ const rootDir = path.resolve(__dirname, '..');
 function run() {
   const packageJsonPath = path.join(rootDir, 'package.json');
   const manifestJsonPath = path.join(rootDir, 'manifest.json');
+  const docsIndexPath = path.join(rootDir, 'docs', 'index.html');
   
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
   const manifestJson = JSON.parse(fs.readFileSync(manifestJsonPath, 'utf-8'));
@@ -39,6 +40,20 @@ function run() {
   // Update manifest.json
   manifestJson.version = newVersion;
   fs.writeFileSync(manifestJsonPath, JSON.stringify(manifestJson, null, 2) + '\n', 'utf-8');
+
+  // Update docs/index.html
+  if (fs.existsSync(docsIndexPath)) {
+    let docsHtml = fs.readFileSync(docsIndexPath, 'utf-8');
+    // Match <div class="badge">Version X.Y — Now Available</div>
+    const badgeRegex = /<div class="badge">Version [\d.]+ — Now Available<\/div>/;
+    if (badgeRegex.test(docsHtml)) {
+      docsHtml = docsHtml.replace(badgeRegex, `<div class="badge">Version ${newVersion} — Now Available</div>`);
+      fs.writeFileSync(docsIndexPath, docsHtml, 'utf-8');
+      console.log(`Updated version in docs/index.html to ${newVersion}`);
+    } else {
+      console.warn('Warning: Could not find version badge in docs/index.html');
+    }
+  }
 
   const { name } = packageJson;
   const zipName = `${name}-v${newVersion}.zip`;
