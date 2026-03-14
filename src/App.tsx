@@ -300,6 +300,7 @@ export default function App() {
         <main className="landing-shell">
           <section className="landing-panel">
             <div className="landing-panel__hero">
+              <img src="/icon128.png" alt="OpusPad Logo" className="landing-panel__logo" />
               <h1 className="landing-panel__title">OpusPad</h1>
               <p className="landing-panel__subtitle">Bridging AI output and human intent, WYSIWYG, private, local only.</p>
             </div>

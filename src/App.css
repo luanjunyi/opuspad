@@ -85,6 +85,14 @@ button {
   margin-bottom: 56px;
 }
 
+.landing-panel__logo {
+  width: 96px;
+  height: 96px;
+  margin-bottom: 32px;
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
 .landing-panel__title {
   font-family: "Instrument Serif", serif;
   font-weight: 400;
