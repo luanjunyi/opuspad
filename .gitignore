@@ -7,6 +7,7 @@ node_modules/
 dist/
 dist-*/
 coverage/
+*.zip
 
 # TypeScript and tool caches
 *.tsbuildinfo
