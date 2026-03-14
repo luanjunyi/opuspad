@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "OpusPad",
-  "version": "1.0",
+  "version": "1.1",
   "description": "OpusPad: Bridging AI output and human intent, WYSIWYG, private, local only.",
   "action": {
     "default_title": "Open Editor",
