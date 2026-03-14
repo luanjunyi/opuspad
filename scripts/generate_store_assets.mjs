@@ -103,7 +103,7 @@ const assets = [
       <body>
         <img src="${iconPath}" class="logo">
         <h1 class="title">OpusPad</h1>
-        <div class="tagline">Bridging AI output and human intent.</div>
+        <div class="tagline">Review and edit AI-generated Markdown locally.</div>
       </body>
       </html>
     `

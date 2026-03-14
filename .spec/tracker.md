@@ -1,5 +1,5 @@
 # Implementation Tracker: Markdown Editor Chrome Extension
-Last updated: 2026-03-14T19:45:00Z
+Last updated: 2026-03-14T17:15:00Z
 
 ## design-doc-md-editor-chrome.md
 | Task | Title | Status | Agent | Notes |
@@ -18,6 +18,6 @@ Last updated: 2026-03-14T19:45:00Z
 ## design-doc-opuspad-store-assets.md
 | Task | Title | Status | Agent | Notes |
 |------|-------|--------|-------|-------|
-| 1 | Create store_assets/texts.md | not_started | — | — |
-| 2 | Update generate_store_assets.mjs promo tiles | not_started | — | — |
-| 3 | Generate 4 Chrome Web Store screenshots | not_started | — | May need manual capture |
+| 1 | Create store_assets/texts.md | done | antigravity | — |
+| 2 | Update generate_store_assets.mjs promo tiles | done | antigravity | — |
+| 3 | Generate 4 Chrome Web Store screenshots | done | antigravity | — |

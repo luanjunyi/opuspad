@@ -7,6 +7,53 @@ interface MockFileSystemTree {
 type MockFileSystemEntry = string | ArrayBuffer | MockFileSystemTree;
 
 const DEFAULT_MOCK_FILE_SYSTEM: MockFileSystemTree = {
+    'CLAUDE.md': `# Project Context
+OpusPad is a local-first Markdown editor for Chrome.
+
+## Code Style Rules
+- Use TypeScript for all logic
+- Prefer functional components
+- Styling with vanilla CSS
+
+## Commands
+\`\`\`bash
+npm run dev
+\`\`\`
+
+| Config | Value |
+|--------|-------|
+| Mode | Local |
+| Sync | None |
+`,
+    'implementation-plan.md': `## Phase 1: Database Migration
+1. Export current data
+2. Run migration script
+3. Verify integrity
+
+\`\`\`sql
+SELECT * FROM users;
+\`\`\`
+`,
+    'architecture-notes.md': `# Architecture Notes
+- Frontend: React + Vite
+- Editor: BlockNote (WYSIWYG)
+- Storage: File System Access API
+
+### API Endpoints (Internal)
+- \`file:///\` access
+- Local storage only
+`,
+    'api-spec.md': `## API Specification
+| Endpoint | Method | Params |
+|----------|--------|--------|
+| /auth | POST | email, pass |
+
+**Important:** Use HTTPS for all production calls. _Note: OpusPad is local only._
+
+\`\`\`json
+{ "status": "ok" }
+\`\`\`
+`,
     'SUBMISSION_GUIDE.md': `# Submitting to the Chrome Web Store
 
 This guide outlines the steps required to publish the Markdown Editor extension to the Chrome Web Store.
