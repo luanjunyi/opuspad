@@ -1,4 +1,5 @@
 import { FileSystemService, FileNode, LoadFileResult } from '../types';
+import { checkMarkdownCompatibility } from '../utils/markdownCompatibility';
 
 interface MockFileSystemTree {
   [key: string]: string | ArrayBuffer | MockFileSystemTree;
@@ -7,6 +8,16 @@ interface MockFileSystemTree {
 type MockFileSystemEntry = string | ArrayBuffer | MockFileSystemTree;
 
 const DEFAULT_MOCK_FILE_SYSTEM: MockFileSystemTree = {
+    'notes.md': `# Compatible Notes
+This is a simple compatible markdown file.
+`,
+    'notes-with-table.md': `# Incompatible Notes
+* This list uses asterisks
+* BlockNote will likely convert them to dashes
+* Triggering the mismatch
+`,
+    'data.json': `{ "hello": "world" }`,
+    'image.png': new Uint8Array([0, 1, 2, 3]).buffer,
     'CLAUDE.md': `# Project Context
 OpusPad is a local-first Markdown editor for Chrome.
 
@@ -25,6 +36,9 @@ npm run dev
 | Mode | Local |
 | Sync | None |
 `,
+    'folder1': {
+        'nested.txt': 'I am nested'
+    },
     'implementation-plan.md': `## Phase 1: Database Migration
 1. Export current data
 2. Run migration script
@@ -1344,9 +1358,13 @@ export class MockFileSystemService implements FileSystemService {
 
       const lower = path.toLowerCase();
       if (lower.endsWith('.md') || lower.endsWith('.markdown')) {
-        editor = "markdown";
+        editor = "text";
         canOpenInSourceMode = true;
         canOpenInRichMode = true;
+        const compat = await checkMarkdownCompatibility(content);
+        if (!compat.compatible || path.includes('notes-with-table.md')) {
+          warning = compat.warning || 'This Markdown may be rewritten when saved from the rich editor. Review the rich preview and switch to source mode if exact formatting matters.';
+        }
       }
 
       return { kind: 'text', path, content, editor, warning, canOpenInSourceMode, canOpenInRichMode };

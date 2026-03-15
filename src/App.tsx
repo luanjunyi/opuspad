@@ -486,7 +486,7 @@ export default function App() {
               <div className="empty-state">
                 <p className="empty-state__eyebrow">Nothing selected</p>
                 <h2>Choose a file from the left.</h2>
-                <p>Markdown opens in rich mode first. If the file may not save back cleanly, you will see a warning and can switch to source mode.</p>
+                <p>Markdown opens in source mode first. You can switch to rich mode for a WYSIWYG experience.</p>
               </div>
             )}
           </main>

@@ -156,14 +156,13 @@ export const BrowserFileSystemService: FileSystemService = {
       let canOpenInRichMode = false;
 
       if (isMarkdownPath(path)) {
-        editor = "markdown";
+        editor = "text";
         canOpenInSourceMode = true;
+        canOpenInRichMode = true;
         const compat = await checkMarkdownCompatibility(content);
         if (!compat.compatible) {
           warning = compat.warning || 'This Markdown may be rewritten when saved from the rich editor. Review the rich preview and switch to source mode if exact formatting matters.';
         }
-      } else {
-        canOpenInRichMode = false;
       }
 
       return { kind: 'text', path, content, editor, warning, canOpenInSourceMode, canOpenInRichMode };

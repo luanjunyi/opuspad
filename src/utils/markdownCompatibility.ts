@@ -31,7 +31,7 @@ export async function checkMarkdownCompatibility(rawMarkdown: string): Promise<M
   return {
     compatible,
     normalizedMarkdown: normalizedRegen,
-    warning: compatible ? undefined : 'Opened in source mode because this Markdown file cannot round-trip safely through the block editor.'
+    warning: compatible ? undefined : 'This Markdown may be rewritten when saved from the rich editor. Review the rich preview and switch to source mode if exact formatting matters.'
   };
 }
 
