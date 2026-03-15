@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on tags like v1.0, v2.1.3
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build extension
+        run: npm run build
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create zip file
+        run: |
+          cd dist
+          zip -r "../opuspad_chrome-v${{ steps.get_version.outputs.VERSION }}.zip" .
+
+      - name: Publish GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "opuspad_chrome-v${{ steps.get_version.outputs.VERSION }}.zip"
+          name: Release v${{ steps.get_version.outputs.VERSION }}
+          allowUpdates: true
+          replacesArtifacts: true
+          draft: false
+          prerelease: false
+          generateReleaseNotes: true
