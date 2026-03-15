@@ -261,6 +261,16 @@ export default function App() {
           return current;
         }
 
+        if (current.state.kind === 'text' && refreshedState.kind === 'text') {
+          refreshedState.editor = current.state.editor;
+          refreshedState.canOpenInRichMode = current.state.canOpenInRichMode;
+          refreshedState.canOpenInSourceMode = current.state.canOpenInSourceMode;
+
+          if (areLoadFileResultsEqual(current.state, refreshedState)) {
+            return current;
+          }
+        }
+
         return {
           ...current,
           state: refreshedState,
