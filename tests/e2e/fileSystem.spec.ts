@@ -15,7 +15,7 @@ test('mock workspace mounts and renders lazily', async ({ page }) => {
   await expect(page.locator('text="nested.txt"')).not.toBeVisible();
 
   // Expand folder1
-  await page.click('text="folder1"');
+  await page.click('[aria-label="Expand folder1"]');
 
   // Now nested.txt should be visible
   await expect(page.locator('text="nested.txt"')).toBeVisible();

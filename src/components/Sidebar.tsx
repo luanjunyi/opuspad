@@ -40,7 +40,7 @@ export function Sidebar({
   const [loadingPaths, setLoadingPaths] = useState<Set<string>>(new Set());
   const [selectedDirectoryPath, setSelectedDirectoryPath] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [markdownOnly, setMarkdownOnly] = useState(false);
+  const [markdownOnly, setMarkdownOnly] = useState(true);
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const hasActiveSearch = searchQuery.trim().length > 0;
   const [indexedFiles, setIndexedFiles] = useState<FileNode[]>([]);

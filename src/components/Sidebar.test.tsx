@@ -104,7 +104,7 @@ describe('Sidebar', () => {
     expect(screen.getByText('No matching files')).toBeInTheDocument();
   });
 
-  it('can restrict search results to markdown files only', async () => {
+  it('restricts search results to markdown files only by default', async () => {
     const docsDir = createDirectory('docs');
 
     mockFsService.readDirectory.mockImplementation((_handle: unknown, path?: string) => {
@@ -130,13 +130,19 @@ describe('Sidebar', () => {
     );
 
     await userEvent.type(screen.getByRole('searchbox', { name: 'Search files' }), 'dgs');
-    await userEvent.click(screen.getByRole('checkbox', { name: 'Markdown only' }));
 
     await waitFor(() => {
       expect(screen.getByText('docs/getting-started.md')).toBeInTheDocument();
     });
 
     expect(screen.queryByText('docs/getting-started.txt')).not.toBeInTheDocument();
+
+    // Now uncheck it
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Markdown only' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('docs/getting-started.txt')).toBeInTheDocument();
+    });
   });
 
   it('matches files through directory names, not just the file name', async () => {
@@ -195,6 +201,7 @@ describe('Sidebar', () => {
       />
     );
 
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Markdown only' }));
     await userEvent.type(screen.getByRole('searchbox', { name: 'Search files' }), 'react');
 
     await waitFor(() => {

@@ -1,4 +1,5 @@
 import { FileSystemService, FileNode, LoadFileResult } from '../types';
+import { checkMarkdownCompatibility } from '../utils/markdownCompatibility';
 
 interface MockFileSystemTree {
   [key: string]: string | ArrayBuffer | MockFileSystemTree;
@@ -7,6 +8,23 @@ interface MockFileSystemTree {
 type MockFileSystemEntry = string | ArrayBuffer | MockFileSystemTree;
 
 const DEFAULT_MOCK_FILE_SYSTEM: MockFileSystemTree = {
+    'notes.md': `# Compatible Notes
+This is a simple compatible markdown file.
+`,
+    'notes-with-table.md': `# Incompatible Notes
+Footnotes are not supported in BlockNote[^1].
+
+[^1]: This will be lost or reformatted.
+
+| Feature | Supported |
+|---------|-----------|
+| Tables  | Maybe?    |
+`,
+    'folder1': {
+        'nested.txt': 'I am nested'
+    },
+    'data.json': `{ "hello": "world" }`,
+    'image.png': new Uint8Array([0, 1, 2, 3]).buffer,
     'CLAUDE.md': `# Project Context
 OpusPad is a local-first Markdown editor for Chrome.
 
@@ -1347,6 +1365,10 @@ export class MockFileSystemService implements FileSystemService {
         editor = "markdown";
         canOpenInSourceMode = true;
         canOpenInRichMode = true;
+        const compat = await checkMarkdownCompatibility(content);
+        if (!compat.compatible) {
+          warning = compat.warning || 'This Markdown may be rewritten when saved from the rich editor. Review the rich preview and switch to source mode if exact formatting matters.';
+        }
       }
 
       return { kind: 'text', path, content, editor, warning, canOpenInSourceMode, canOpenInRichMode };
