@@ -20,13 +20,11 @@ test('text editor routes correctly and auto saves', async ({ page }) => {
   await expect(page.locator('text="Unsupported File"')).toBeVisible();
   await expect(page.locator('text="Binary files cannot be edited"')).toBeVisible();
   
-  // Incompatible markdown opens in source mode by default now
+  // Incompatible markdown opens in rich mode first, with an explicit source-mode escape hatch
   await page.click('text="notes-with-table.md"');
-  await expect(page.locator('.cm-editor')).toBeVisible();
-  await expect(page.locator('text=/This Markdown may be rewritten when saved from the rich editor/')).toBeVisible();
-  await expect(page.locator('text="Open rich"')).toBeVisible();
-  
-  // Can explicitly open rich
-  await page.click('text="Open rich"');
   await expect(page.locator('.bn-editor')).toBeVisible();
+  await expect(page.locator('text=/This Markdown may be rewritten when saved from the rich editor/')).toBeVisible();
+  await page.click('text="Open source"');
+  await expect(page.locator('.cm-editor')).toBeVisible();
+  await expect(page.locator('text="Source mode recommended"')).toBeVisible();
 });
