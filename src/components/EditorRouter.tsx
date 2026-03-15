@@ -19,12 +19,12 @@ export function EditorRouter({
   const { state } = activeFile;
 
   if (state.kind === 'error') {
-    return <TextEditor activeFile={activeFile} reloadNonce={reloadNonce} onSave={onSave} onDirty={onDirty} />;
+    return <TextEditor key={`${activeFile.node.path}:${reloadNonce}:error`} activeFile={activeFile} reloadNonce={reloadNonce} onSave={onSave} onDirty={onDirty} />;
   }
 
   if (state.editor === 'markdown') {
-    return <MarkdownEditor activeFile={activeFile} reloadNonce={reloadNonce} onSave={onSave} onDirty={onDirty} />;
+    return <MarkdownEditor key={`${activeFile.node.path}:${reloadNonce}:markdown`} activeFile={activeFile} reloadNonce={reloadNonce} onSave={onSave} onDirty={onDirty} />;
   }
 
-  return <TextEditor activeFile={activeFile} reloadNonce={reloadNonce} onSave={onSave} onDirty={onDirty} />;
+  return <TextEditor key={`${activeFile.node.path}:${reloadNonce}:text`} activeFile={activeFile} reloadNonce={reloadNonce} onSave={onSave} onDirty={onDirty} />;
 }

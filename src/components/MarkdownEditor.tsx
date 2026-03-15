@@ -24,6 +24,7 @@ export function MarkdownEditor({
   const latestLoadId = useRef(0);
   const editorRef = useRef<BlockNoteEditor | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingMarkdownRef = useRef<string | Promise<string> | null>(null);
   const onSaveRef = useRef(onSave);
   const onDirtyRef = useRef(onDirty);
 
@@ -35,11 +36,24 @@ export function MarkdownEditor({
     onDirtyRef.current = onDirty;
   }, [onDirty]);
 
+  const flushPendingSaveSnapshot = useCallback(() => {
+    if (pendingMarkdownRef.current === null) {
+      return;
+    }
+
+    const pendingMarkdown = pendingMarkdownRef.current;
+    pendingMarkdownRef.current = null;
+    void Promise.resolve(pendingMarkdown).then((markdown) => {
+      onSaveRef.current(markdown);
+    });
+  }, []);
+
   useEffect(() => {
     const loadId = ++latestLoadId.current;
     let cancelled = false;
 
     setEditor(null);
+    pendingMarkdownRef.current = null;
 
     async function loadEditor() {
       const e = BlockNoteEditor.create();
@@ -63,16 +77,12 @@ export function MarkdownEditor({
       cancelled = true;
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
-        if (editorRef.current) {
-          void Promise.resolve(editorRef.current.blocksToMarkdownLossy(editorRef.current.document)).then((markdown) => {
-            onSaveRef.current(markdown);
-          });
-        }
+        flushPendingSaveSnapshot();
         saveTimeoutRef.current = null;
       }
       editorRef.current = null;
     };
-  }, [activeFile.node.path, reloadNonce]); // Re-load if the file changes or a same-file reload is requested
+  }, [activeFile.node.path, flushPendingSaveSnapshot, reloadNonce]); // Re-load if the file changes or a same-file reload is requested
 
   const handleChange = useCallback(() => {
     if (!editor) return;
@@ -84,12 +94,12 @@ export function MarkdownEditor({
     }
 
     const currentEditor = editor;
-    saveTimeoutRef.current = setTimeout(async () => {
-      const markdown = await Promise.resolve(currentEditor.blocksToMarkdownLossy(currentEditor.document));
-      onSaveRef.current(markdown);
+    pendingMarkdownRef.current = currentEditor.blocksToMarkdownLossy(currentEditor.document);
+    saveTimeoutRef.current = setTimeout(() => {
+      flushPendingSaveSnapshot();
       saveTimeoutRef.current = null;
     }, 500);
-  }, [editor]);
+  }, [editor, flushPendingSaveSnapshot]);
 
   const handleKeyDownCapture = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
     if (shouldPreventEditorPageScroll(event.target, event.key)) {
@@ -112,8 +122,16 @@ export function MarkdownEditor({
         </div>
       )}
       <BlockNoteView
+        comments={false}
         editor={editor}
+        emojiPicker={false}
+        filePanel={false}
+        formattingToolbar={false}
+        linkToolbar={false}
         onChange={handleChange}
+        sideMenu={false}
+        slashMenu={false}
+        tableHandles={false}
       />
     </div>
   );

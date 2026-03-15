@@ -4,6 +4,7 @@
   "version": "1.2",
   "description": "Review and edit local Markdown files in Chrome. WYSIWYG + source mode. 100% private, zero uploads. Built for AI-indigenous builders.",
   "action": {
+    "default_popup": "popup.html",
     "default_title": "Open Editor",
     "default_icon": {
       "16": "icon16.png",
@@ -15,10 +16,6 @@
     "16": "icon16.png",
     "48": "icon48.png",
     "128": "icon128.png"
-  },
-  "background": {
-    "service_worker": "src/background.ts",
-    "type": "module"
   },
   "permissions": []
 }

@@ -257,7 +257,7 @@ describe('Sidebar', () => {
 
     mockFsService.readDirectory.mockImplementation((_handle: unknown, path?: string) => {
       if (path === 'scripts') {
-        return Promise.resolve([createFile('scripts/sec-pipeline.ts')]);
+        return Promise.resolve([createFile('scripts/sec-pipeline.md')]);
       }
 
       return Promise.resolve([]);
@@ -277,7 +277,7 @@ describe('Sidebar', () => {
     await userEvent.type(screen.getByRole('searchbox', { name: 'Search files' }), searchQuery);
 
     await waitFor(() => {
-      expect(screen.getByText('scripts/sec-pipeline.ts')).toBeInTheDocument();
+      expect(screen.getByText('scripts/sec-pipeline.md')).toBeInTheDocument();
     });
     expect(mockFsService.readDirectory).toHaveBeenCalledTimes(1);
 
@@ -292,7 +292,7 @@ describe('Sidebar', () => {
       />
     );
 
-    expect(screen.getByText('scripts/sec-pipeline.ts')).toBeInTheDocument();
+    expect(screen.getByText('scripts/sec-pipeline.md')).toBeInTheDocument();
     expect(screen.queryByText('No matching files')).not.toBeInTheDocument();
     expect(mockFsService.readDirectory).toHaveBeenCalledTimes(1);
   });

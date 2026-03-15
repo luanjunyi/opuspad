@@ -63,9 +63,32 @@ vi.mock('@blocknote/core', () => ({
 }));
 
 vi.mock('@blocknote/mantine', () => ({
-  BlockNoteView: ({ editor, onChange }: any) => (
+  BlockNoteView: ({
+    comments,
+    editor,
+    emojiPicker,
+    filePanel,
+    formattingToolbar,
+    linkToolbar,
+    onChange,
+    sideMenu,
+    slashMenu,
+    tableHandles,
+  }: any) => (
     <div>
-      <button data-testid="blocknote-view" data-editor-id={editor.id} onClick={() => onChange()}>
+      <button
+        data-comments={String(comments)}
+        data-emoji-picker={String(emojiPicker)}
+        data-file-panel={String(filePanel)}
+        data-formatting-toolbar={String(formattingToolbar)}
+        data-link-toolbar={String(linkToolbar)}
+        data-side-menu={String(sideMenu)}
+        data-slash-menu={String(slashMenu)}
+        data-table-handles={String(tableHandles)}
+        data-testid="blocknote-view"
+        data-editor-id={editor.id}
+        onClick={() => onChange()}
+      >
         {editor.id}
       </button>
       <div data-testid="blocknote-content" contentEditable suppressContentEditableWarning>
@@ -136,6 +159,7 @@ describe('MarkdownEditor', () => {
 
     fireEvent.click(screen.getByTestId('blocknote-view'));
     expect(onSave).not.toHaveBeenCalled();
+    expect(editor.blocksToMarkdownLossy).toHaveBeenCalledTimes(1);
 
     unmount();
 
@@ -145,6 +169,7 @@ describe('MarkdownEditor', () => {
 
     expect(onSave).toHaveBeenCalledTimes(1);
     expect(onSave).toHaveBeenCalledWith('serialized:editor-1');
+    expect(editor.blocksToMarkdownLossy).toHaveBeenCalledTimes(1);
   });
 
   it('clears the previous editor while a new markdown file is loading', async () => {
@@ -291,5 +316,30 @@ describe('MarkdownEditor', () => {
     fireEvent(screen.getByTestId('blocknote-content'), spaceEvent);
 
     expect(spaceEvent.defaultPrevented).toBe(false);
+  });
+
+  it('disables the default BlockNote overlay UI controllers', async () => {
+    const editor = createMockEditor('editor-1', Promise.resolve([{ type: 'paragraph' }]));
+    blockNoteCreate.mockReturnValue(editor);
+
+    render(
+      <MarkdownEditor
+        activeFile={createActiveFile('notes.md', '# hello')}
+        onSave={vi.fn()}
+        onDirty={vi.fn()}
+      />
+    );
+
+    await waitFor(() => {
+      const editorView = screen.getByTestId('blocknote-view');
+      expect(editorView).toHaveAttribute('data-comments', 'false');
+      expect(editorView).toHaveAttribute('data-emoji-picker', 'false');
+      expect(editorView).toHaveAttribute('data-file-panel', 'false');
+      expect(editorView).toHaveAttribute('data-formatting-toolbar', 'false');
+      expect(editorView).toHaveAttribute('data-link-toolbar', 'false');
+      expect(editorView).toHaveAttribute('data-side-menu', 'false');
+      expect(editorView).toHaveAttribute('data-slash-menu', 'false');
+      expect(editorView).toHaveAttribute('data-table-handles', 'false');
+    });
   });
 });

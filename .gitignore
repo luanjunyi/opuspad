@@ -1,5 +1,7 @@
 .codex/
 .antigravity/
+.gemini/
+.playwright-extension-profile/
 # Dependencies
 node_modules/
 
