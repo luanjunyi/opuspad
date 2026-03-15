@@ -251,6 +251,52 @@ describe('Sidebar', () => {
     });
   });
 
+  it('keeps existing search results visible while the workspace index refreshes', async () => {
+    const searchQuery = 'sec-pipline';
+    const scriptsDir = createDirectory('scripts');
+
+    mockFsService.readDirectory.mockImplementation((_handle: unknown, path?: string) => {
+      if (path === 'scripts') {
+        return Promise.resolve([createFile('scripts/sec-pipeline.ts')]);
+      }
+
+      return Promise.resolve([]);
+    });
+
+    const { rerender } = render(
+      <Sidebar
+        nodes={[scriptsDir]}
+        onCreateFile={vi.fn()}
+        onDeleteFile={vi.fn()}
+        onFileSelect={vi.fn()}
+        onNodesChange={vi.fn()}
+        rootHandle={rootHandle}
+      />
+    );
+
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Search files' }), searchQuery);
+
+    await waitFor(() => {
+      expect(screen.getByText('scripts/sec-pipeline.ts')).toBeInTheDocument();
+    });
+    expect(mockFsService.readDirectory).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <Sidebar
+        nodes={[createDirectory('scripts')]}
+        onCreateFile={vi.fn()}
+        onDeleteFile={vi.fn()}
+        onFileSelect={vi.fn()}
+        onNodesChange={vi.fn()}
+        rootHandle={rootHandle}
+      />
+    );
+
+    expect(screen.getByText('scripts/sec-pipeline.ts')).toBeInTheDocument();
+    expect(screen.queryByText('No matching files')).not.toBeInTheDocument();
+    expect(mockFsService.readDirectory).toHaveBeenCalledTimes(1);
+  });
+
   it('creates a new file in the root directory when no folder is selected', async () => {
     const onCreateFile = vi.fn().mockResolvedValue(createFile('root.md'));
 

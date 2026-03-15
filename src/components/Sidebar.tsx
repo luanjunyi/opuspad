@@ -51,6 +51,7 @@ export function Sidebar({
   const [createError, setCreateError] = useState<string | null>(null);
   const [deletingPath, setDeletingPath] = useState<string | null>(null);
   const resultButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const fullyIndexedRootHandleRef = useRef<FileSystemDirectoryHandle | null>(null);
 
   const updateNodes = (updater: (currentNodes: FileNode[]) => FileNode[]) => {
     setNodes((currentNodes) => {
@@ -65,9 +66,27 @@ export function Sidebar({
   }, [initialNodes]);
 
   useEffect(() => {
-    setIndexedFiles(collectSearchableFiles(initialNodes));
-    setIndexingState('idle');
-  }, [initialNodes]);
+    const immediateIndexedFiles = collectSearchableFiles(initialNodes);
+    setIndexedFiles((currentIndexedFiles) => {
+      if (!hasActiveSearch) {
+        return immediateIndexedFiles;
+      }
+
+      return mergeIndexedFiles(currentIndexedFiles, immediateIndexedFiles);
+    });
+
+    setIndexingState((currentState) => {
+      if (!hasActiveSearch) {
+        return 'idle';
+      }
+
+      if (rootHandle !== fullyIndexedRootHandleRef.current) {
+        return 'idle';
+      }
+
+      return currentState;
+    });
+  }, [hasActiveSearch, initialNodes, rootHandle]);
 
   useEffect(() => {
     if (!selectedDirectoryPath) {
@@ -143,6 +162,7 @@ export function Sidebar({
 
       if (!cancelled) {
         flushIndexedFiles();
+        fullyIndexedRootHandleRef.current = rootHandle;
         setIndexingState('ready');
       }
     };
@@ -526,6 +546,16 @@ function collectSearchableFiles(nodes: FileNode[]): FileNode[] {
 
     return collectSearchableFiles(node.children);
   });
+}
+
+function mergeIndexedFiles(existingFiles: FileNode[], nextFiles: FileNode[]): FileNode[] {
+  const mergedFilesByPath = new Map(existingFiles.map((node) => [node.path, node]));
+
+  for (const node of nextFiles) {
+    mergedFilesByPath.set(node.path, node);
+  }
+
+  return Array.from(mergedFilesByPath.values());
 }
 
 function shouldSkipSearchDirectory(node: Pick<FileNode, 'kind' | 'name'>): boolean {
