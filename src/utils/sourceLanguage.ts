@@ -1,5 +1,6 @@
 export type SourceLanguage =
   | 'plain'
+  | 'python'
   | 'markdown'
   | 'json'
   | 'javascript'
@@ -12,6 +13,10 @@ export function getSourceLanguage(path: string): SourceLanguage {
 
   if (lowerPath.endsWith('.json')) {
     return 'json';
+  }
+
+  if (lowerPath.endsWith('.py')) {
+    return 'python';
   }
 
   if (lowerPath.endsWith('.tsx')) {

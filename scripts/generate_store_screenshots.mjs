@@ -30,14 +30,14 @@ const screenshots = [
   },
   {
     name: 'screenshot_3_local_private',
-    file: 'architecture-notes.md',
+    file: 'main.py',
     title: '100% local. Zero uploads.',
-    subtitle: 'Your proprietary specs never leave your machine.',
-    mode: 'rich'
+    subtitle: 'Your proprietary code never leaves your machine.',
+    mode: 'source'
   },
   {
     name: 'screenshot_4_source_mode',
-    file: 'api-spec.md',
+    file: 'implementation-plan.md',
     title: 'Toggle to raw Markdown instantly.',
     subtitle: 'Full control when syntax gets complex.',
     mode: 'source'

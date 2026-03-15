@@ -3,6 +3,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { json } from '@codemirror/lang-json';
 import { javascript } from '@codemirror/lang-javascript';
 import { markdown } from '@codemirror/lang-markdown';
+import { python } from '@codemirror/lang-python';
 import { ActiveFile } from '../types';
 import { shouldPreventEditorPageScroll } from '../utils/editorKeyboard';
 import { getSourceLanguage } from '../utils/sourceLanguage';
@@ -104,6 +105,8 @@ export function TextEditor({ activeFile, reloadNonce = 0, onSave, onDirty }: Tex
     switch (getSourceLanguage(fileState.path)) {
       case 'json':
         return [json()];
+      case 'python':
+        return [python()];
       case 'javascript':
         return [javascript()];
       case 'jsx':

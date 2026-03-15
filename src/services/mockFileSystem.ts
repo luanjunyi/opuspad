@@ -54,6 +54,28 @@ SELECT * FROM users;
 { "status": "ok" }
 \`\`\`
 `,
+    'main.py': `import os
+import sys
+from typing import List, Dict
+
+def process_data(file_paths: List[str]) -> Dict[str, int]:
+    """
+    Process multiple files line by line and return the results.
+    We use this to analyze the data directory in real-time.
+    """
+    results = {}
+    for path in file_paths:
+        if os.path.exists(path):
+            with open(path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                results[path] = len(content.splitlines())
+    return results
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        metrics = process_data(sys.argv[1:])
+        print(f"Metrics computed: {metrics}")
+`,
     'SUBMISSION_GUIDE.md': `# Submitting to the Chrome Web Store
 
 This guide outlines the steps required to publish the Markdown Editor extension to the Chrome Web Store.
