@@ -216,19 +216,159 @@
             border-color: var(--text-secondary);
         }
 
-        .hero-image {
+        /* Carousel Styles */
+        .carousel-container {
+            position: relative;
             width: 100%;
-            border-radius: var(--radius);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-            border: 1px solid var(--border);
+            max-width: 1280px;
+            margin: 0 auto 80px;
+            border-radius: 16px;
             overflow: hidden;
-            margin-bottom: 80px;
-            background: var(--surface);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0,0,0,0.05);
+            background: var(--dark-bg);
         }
 
-        .hero-image img {
+        .carousel-track {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: transform;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            position: relative;
+        }
+
+        .carousel-slide img {
             width: 100%;
+            height: auto;
             display: block;
+            border-radius: 16px; /* Matches container */
+        }
+
+        /* Sleek overlay caption */
+        .carousel-caption {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 20px 28px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: left;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            transition-delay: 0.3s;
+        }
+
+        .carousel-slide.active .carousel-caption {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .caption-label {
+            display: inline-block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .carousel-caption h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+        }
+
+        /* Navigation Buttons */
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0,0,0,0.1);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 10;
+            transition: all 0.2s ease;
+            opacity: 0;
+        }
+
+        .carousel-container:hover .carousel-nav {
+            opacity: 1;
+        }
+
+        .carousel-nav:hover {
+            background: white;
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .carousel-nav.prev {
+            left: 20px;
+        }
+
+        .carousel-nav.next {
+            right: 20px;
+        }
+
+        /* Indicators */
+        .carousel-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+            background: rgba(0,0,0,0.4);
+            padding: 8px 12px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: white;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .carousel-caption {
+                bottom: 15px;
+                left: 15px;
+                right: 15px;
+                padding: 15px 20px;
+            }
+            .carousel-caption h3 {
+                font-size: 1.1rem;
+            }
+            .carousel-nav {
+                display: none;
+            }
         }
 
         /* Shared Section Title */
@@ -543,8 +683,46 @@
                     </a>
                 </div>
 
-                <div class="hero-image">
-                    <img src="preview.jpg" alt="OpusPad Product Interface">
+                <div class="carousel-container">
+                    <div class="carousel-track" id="carouselTrack">
+                        <div class="carousel-slide">
+                            <img src="stock_check_md_1_rich.png" alt="OpusPad Rich Editor">
+                            <div class="carousel-caption">
+                                <span class="caption-label">Feature</span>
+                                <h3>Rich WYSIWYG Markdown Editing</h3>
+                            </div>
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="stock_check_md_2_source.png" alt="OpusPad Source Editor">
+                            <div class="carousel-caption">
+                                <span class="caption-label">Control</span>
+                                <h3>Powerful Source Mode</h3>
+                            </div>
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="stock_check_tsx_1.png" alt="OpusPad Code Viewer">
+                            <div class="carousel-caption">
+                                <span class="caption-label">Versatile</span>
+                                <h3>Syntax Highlighting for Code</h3>
+                            </div>
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="stock_check_md_3_rich.png" alt="OpusPad UI">
+                            <div class="carousel-caption">
+                                <span class="caption-label">Clean</span>
+                                <h3>Distraction-Free Interface</h3>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="carousel-nav prev" aria-label="Previous slide" id="btnPrev">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                    </button>
+                    <button class="carousel-nav next" aria-label="Next slide" id="btnNext">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                    </button>
+                    
+                    <div class="carousel-indicators" id="carouselIndicators"></div>
                 </div>
             </div>
 
@@ -783,6 +961,77 @@
         
         menuToggle.addEventListener('click', () => {
             navLinks.classList.toggle('active');
+        });
+
+        // Carousel Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const track = document.getElementById('carouselTrack');
+            const slides = Array.from(track.children);
+            const btnNext = document.getElementById('btnNext');
+            const btnPrev = document.getElementById('btnPrev');
+            const indicatorsContainer = document.getElementById('carouselIndicators');
+            
+            let currentIndex = 0;
+            const slideCount = slides.length;
+            let autoPlayInterval;
+
+            // Initialize Indicators
+            slides.forEach((_, idx) => {
+                const dot = document.createElement('div');
+                dot.classList.add('indicator');
+                if (idx === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSlide(idx));
+                indicatorsContainer.appendChild(dot);
+            });
+            
+            const indicators = Array.from(indicatorsContainer.children);
+            slides[0].classList.add('active');
+
+            function updateCarousel() {
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                // Update active states
+                slides.forEach((slide, idx) => {
+                    slide.classList.toggle('active', idx === currentIndex);
+                });
+                indicators.forEach((dot, idx) => {
+                    dot.classList.toggle('active', idx === currentIndex);
+                });
+            }
+
+            function goToSlide(index) {
+                currentIndex = index;
+                updateCarousel();
+                resetAutoPlay();
+            }
+
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % slideCount;
+                updateCarousel();
+            }
+
+            function prevSlide() {
+                currentIndex = (currentIndex - 1 + slideCount) % slideCount;
+                updateCarousel();
+            }
+
+            function resetAutoPlay() {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = setInterval(nextSlide, 5000);
+            }
+
+            btnNext.addEventListener('click', () => {
+                nextSlide();
+                resetAutoPlay();
+            });
+
+            btnPrev.addEventListener('click', () => {
+                prevSlide();
+                resetAutoPlay();
+            });
+
+            // Start Autoplay
+            resetAutoPlay();
         });
 
         // Intersection Observer for Fade-in Animations
