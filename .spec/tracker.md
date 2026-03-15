@@ -12,8 +12,8 @@ Last updated: 2026-03-14T17:15:00Z
 ## design-doc-opuspad-homepage.md
 | Task | Title | Status | Agent | Notes |
 |------|-------|--------|-------|-------|
-| 1 | Rewrite docs/index.html with new page structure and content | not_started | — | — |
-| 2 | Update the hero screenshot image | not_started | — | May need manual capture |
+| 1 | Rewrite docs/index.html with new page structure and content | done | Gemini | — |
+| 2 | Update the hero screenshot image | done | Gemini | Playwright screenshot generated |
 
 ## design-doc-opuspad-store-assets.md
 | Task | Title | Status | Agent | Notes |

@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpusPad | Your Local Markdown Workplace</title>
-    <meta name="description" content="A premium Chrome extension that transforms your browser into a local-first, WYSIWYG Markdown editor. Private, fast, and built for AI-human collaboration.">
+    <title>OpusPad | Review and edit AI-generated Markdown</title>
+    <meta name="description" content="Review and edit AI-generated Markdown without leaving your browser. A local-first Chrome extension built for developers.">
+    <link rel="icon" type="image/png" href="favicon.png" sizes="16x16">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,6 +18,10 @@
             --accent: #2563eb;
             --accent-soft: #eff6ff;
             --border: #e2e8f0;
+            --dark-bg: #0f172a;
+            --dark-surface: #1e293b;
+            --dark-text: #f8fafc;
+            --dark-muted: #94a3b8;
             --radius: 12px;
             --font: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
@@ -35,6 +40,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* Navigation */
         nav {
             display: flex;
             justify-content: space-between;
@@ -48,6 +54,15 @@
             backdrop-filter: blur(8px);
             border-bottom: 1px solid var(--border);
             z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
         }
 
         .logo {
@@ -83,6 +98,16 @@
             color: var(--accent);
         }
 
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        /* Layout */
         main {
             padding-top: 120px;
         }
@@ -93,10 +118,32 @@
             padding: 0 5%;
         }
 
+        .section-spacing {
+            margin-bottom: 100px;
+        }
+
+        /* Fade In Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hero */
         .hero {
             text-align: center;
             padding: 4rem 0;
-            animation: fadeIn 0.8s ease-out;
+            animation: heroFadeIn 0.8s ease-out;
+        }
+
+        @keyframes heroFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .badge {
@@ -111,7 +158,7 @@
         }
 
         h1 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
             font-weight: 700;
             line-height: 1.1;
             letter-spacing: -0.02em;
@@ -120,7 +167,7 @@
         }
 
         .subtitle {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             color: var(--text-secondary);
             max-width: 700px;
             margin: 0 auto 40px;
@@ -142,11 +189,12 @@
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
         }
 
         .btn-primary {
-            background: var(--text-primary);
+            background: var(--accent);
             color: white;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
@@ -154,6 +202,7 @@
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background: #1d4ed8;
         }
 
         .btn-secondary {
@@ -182,6 +231,7 @@
             display: block;
         }
 
+        /* Shared Section Title */
         .section-title {
             text-align: center;
             margin-bottom: 48px;
@@ -197,13 +247,14 @@
             color: var(--text-secondary);
             max-width: 600px;
             margin: 0 auto;
+            font-size: 1.15rem;
         }
 
+        /* Features */
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 32px;
-            margin-bottom: 100px;
         }
 
         .feature-card {
@@ -222,16 +273,9 @@
         }
 
         .feature-icon {
-            width: 48px;
-            height: 48px;
-            background: white;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 2rem;
             margin-bottom: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            font-size: 1.5rem;
+            display: inline-block;
         }
 
         .feature-card h3 {
@@ -242,35 +286,171 @@
 
         .feature-card p {
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 1rem;
         }
 
-        .why-ai {
-            background: var(--text-primary);
-            color: white;
-            padding: 80px 0;
-            border-radius: var(--radius);
+        /* Why It Matters */
+        .why-it-matters {
+            background: var(--dark-bg);
+            color: var(--dark-text);
+            padding: 100px 0;
+            margin: 0;
+        }
+        
+        .why-it-matters h2 {
+            font-size: 2.5rem;
             text-align: center;
-            margin-bottom: 100px;
+            margin-bottom: 64px;
         }
 
-        .why-ai h2 {
-            font-size: 2.25rem;
+        .panel {
+            display: flex;
+            align-items: center;
+            gap: 64px;
+            margin-bottom: 80px;
+        }
+        
+        .panel:last-child {
+            margin-bottom: 0;
+        }
+
+        .panel-content {
+            flex: 1;
+        }
+
+        .panel h3 {
+            font-size: 1.75rem;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        .panel p {
+            font-size: 1.15rem;
+            color: var(--dark-muted);
+            line-height: 1.8;
+        }
+
+        .panel-illustration {
+            flex: 1;
+            background: var(--dark-surface);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius);
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            font-size: 1.5rem;
+            color: var(--dark-muted);
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* Comparison Table */
+        .comparison {
+            padding: 100px 0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            background: var(--surface);
+        }
+
+        th:first-child {
+            border-top-left-radius: var(--radius);
+        }
+
+        th:last-child {
+            border-top-right-radius: var(--radius);
+        }
+
+        td:first-child {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .cell-opuspad {
+            background: var(--accent-soft);
+            font-weight: 600;
+        }
+
+        th.cell-opuspad {
+            color: var(--accent);
+        }
+
+        /* FAQ */
+        .faq {
+            padding: 100px 0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            margin-bottom: 32px;
+        }
+        
+        .faq-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .faq-item h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .faq-item p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Closing CTA */
+        .closing-cta {
+            background: var(--dark-bg);
+            color: var(--dark-text);
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .closing-cta h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
             margin-bottom: 24px;
         }
 
-        .why-ai p {
-            max-width: 700px;
-            margin: 0 auto 32px;
-            color: #94a3b8;
-            font-size: 1.125rem;
+        .closing-cta p {
+            font-size: 1.25rem;
+            color: var(--dark-muted);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
+        /* Footer */
         footer {
-            padding: 64px 0 32px;
+            padding: 48px 0;
             border-top: 1px solid var(--border);
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
 
         .footer-content {
@@ -293,25 +473,52 @@
             color: var(--text-primary);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 20px;
+                border-bottom: 1px solid var(--border);
+                text-align: center;
+            }
+            .nav-links.active {
+                display: flex;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            
             .cta-group { flex-direction: column; align-items: stretch; }
             .footer-content { flex-direction: column; gap: 24px; text-align: center; }
+            
+            .panel {
+                flex-direction: column;
+                gap: 32px;
+            }
+            
+            .panel:nth-child(even) {
+                flex-direction: column;
+            }
+            
+            th, td {
+                padding: 12px 16px;
+            }
         }
     </style>
 </head>
 <body>
     <nav>
-        <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <div class="nav-container">
             <a href="#" class="logo">
                 <img src="icon128.png" alt="OpusPad Logo">
                 OpusPad
             </a>
+            <button class="menu-toggle" aria-label="Toggle menu">☰</button>
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="https://github.com/luanjunyi/md-editor-in-chrome" target="_blank">Source</a>
@@ -321,15 +528,14 @@
     </nav>
 
     <main>
-        <div class="container">
+        <div class="container section-spacing">
             <div class="hero">
-                <div class="badge">Version 1.2.0 — Now Available</div>
-                <h1>The Local Markdown Workplace</h1>
-                <p class="subtitle">A premium Chrome extension that transforms your browser into a powerful, local-first editor. Built for humans, optimized for AI.</p>
+                <div class="badge">Chrome Extension — Free & Open Source</div>
+                <h1>Editor for AI-Human collaboration, in your browser</h1>
+                <p class="subtitle">Built for AI-indigenous builders. No sign-ups, no uploads. Open, review, and edit your Markdown files instantly—WYSIWYG or source mode. Works with other text formats too with highlights.</p>
                 
                 <div class="cta-group">
                     <a href="https://chromewebstore.google.com/detail/opuspad/ephlhjlnpnjjnjgdohdnbknadhklcoag" class="btn btn-primary">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                         Add to Chrome — It's Free
                     </a>
                     <a href="https://github.com/luanjunyi/md-editor-in-chrome" class="btn btn-secondary">
@@ -342,52 +548,218 @@
                 </div>
             </div>
 
-            <div class="section-title" id="features">
-                <h2>Engineered for Excellence</h2>
-                <p>OpusPad combines the speed of the browser with the power of your local file system.</p>
+            <div class="section-title fade-in" id="features">
+                <h2>Everything you need. Nothing you don't.</h2>
+                <p>OpusPad does one thing well: make your local Markdown files fast to open, easy to read, and simple to edit.</p>
             </div>
 
-            <div class="features">
-                <div class="feature-card">
-                    <div class="feature-icon">📂</div>
-                    <h3>Native File System</h3>
-                    <p>Read and write directly to your local folders using the browser's native API. No middleman, just direct access.</p>
-                </div>
-                <div class="feature-card">
+            <div class="features section-spacing">
+                <div class="feature-card fade-in">
                     <div class="feature-icon">✍️</div>
-                    <h3>Dual-Editor Logic</h3>
-                    <p>Switch between a beautiful WYSIWYG block editor for creative writing and a robust code editor for technical precision.</p>
+                    <h3>WYSIWYG Editing</h3>
+                    <p>A clean block editor for natural reading and editing. Tables, code blocks, and lists render beautifully — not as raw tags.</p>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🛡️</div>
-                    <h3>Compatibility Guard</h3>
-                    <p>Edit with confidence. Our intelligent guard ensures complex Markdown stays intact by falling back to source mode when needed.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>Zero Bloat</h3>
-                    <p>Skip the Electron overhead. OpusPad is a lightweight Chrome extension that integrates seamlessly into your existing workflow.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔄</div>
-                    <h3>Seamless Autosave</h3>
-                    <p>Focus on your work. OpusPad automatically saves your changes to disk with intelligent debouncing and state preservation.</p>
-                </div>
-                <div class="feature-card">
+                <div class="feature-card fade-in">
                     <div class="feature-icon">🔒</div>
-                    <h3>Privacy by Design</h3>
-                    <p>Your data is yours. 100% local execution. No cloud syncing, no data collection, and no analytics. Ever.</p>
+                    <h3>100% Private</h3>
+                    <p>Zero telemetry. Zero uploads. Zero data collection. Your code specs never leave your machine.</p>
                 </div>
-            </div>
-
-            <div class="why-ai">
-                <div class="container">
-                    <h2>Built for the AI Age</h2>
-                    <p>AI agents are great at producing Markdown, but humans need a better way to review and edit it. OpusPad is the perfect bridge, providing a structured, readable interface for AI-generated content.</p>
-                    <a href="https://github.com/luanjunyi/md-editor-in-chrome" class="btn btn-secondary" style="border: none;">Learn about our mission</a>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔓</div>
+                    <h3>Open Source</h3>
+                    <p>Built in the open. Inspect the source code, verify its security, or contribute improvements on GitHub.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">📡</div>
+                    <h3>External Change Detection</h3>
+                    <p>When an AI agent updates a file on disk, OpusPad detects the change and reloads automatically. Stay in sync without switching windows.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Auto Save</h3>
+                    <p>Your edits are saved to disk automatically. No manual Ctrl+S required — just type and it persists.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">📂</div>
+                    <h3>Local File Access</h3>
+                    <p>Open any folder from your disk. Read and write directly using Chrome's native File System API. No cloud, no middleman.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">💻</div>
+                    <h3>Source Mode</h3>
+                    <p>Drop down to raw Markdown when syntax gets complex. Full CodeMirror editor with syntax highlighting.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">📁</div>
+                    <h3>Directory Sidebar</h3>
+                    <p>Browse your project's file tree with a collapsible sidebar. Smart fuzzy search lets you jump to any file instantly.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">➕</div>
+                    <h3>File Management</h3>
+                    <p>Create new Markdown files and delete old ones directly from the sidebar. No need to open a terminal.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Lightweight</h3>
+                    <p>No Electron overhead. Runs natively inside Chrome. Opens instantly. Closes cleanly. Stays out of your way.</p>
                 </div>
             </div>
         </div>
+
+        <section class="why-it-matters section-spacing">
+            <div class="container fade-in">
+                <h2>Why It Matters</h2>
+                
+                <div class="panel fade-in">
+                    <div class="panel-content">
+                        <h3>Built for Agent Workflows</h3>
+                        <p>AI coding agents generate a massive amount of Markdown — architecture plans, <code>CLAUDE.md</code> rulesets, implementation notes. OpusPad gives you an instant, readable interface to review and refine these documents without breaking your flow.</p>
+                    </div>
+                    <div class="panel-illustration">
+                        AI → Markdown → You
+                    </div>
+                </div>
+
+                <div class="panel fade-in" style="flex-direction: row-reverse;">
+                    <div class="panel-content">
+                        <h3>The Missing Middle Ground</h3>
+                        <p>TextEdit shows you raw tags. VS Code is overkill for a quick review. Cloud editors require an upload. OpusPad sits in the sweet spot: browser-native, local-first, and purpose-built for reading Markdown the way it was meant to be seen.</p>
+                    </div>
+                    <div class="panel-illustration">
+                        Not too heavy.<br>Not too simple.
+                    </div>
+                </div>
+
+                <div class="panel fade-in">
+                    <div class="panel-content">
+                        <h3>Written Communication with AI</h3>
+                        <p>The best AI workflows are conversational — you write specs, the agent implements, you review the output, and iterate. OpusPad makes that review/edit step frictionless. Open a file, refine the text, save. Back to your agent in seconds.</p>
+                    </div>
+                    <div class="panel-illustration">
+                        Iterate Faster
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="comparison container section-spacing fade-in">
+            <div class="section-title">
+                <h2>How OpusPad compares</h2>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th class="cell-opuspad">OpusPad</th>
+                            <th>Raw Browser</th>
+                            <th>VS Code / Obsidian</th>
+                            <th>Cloud Docs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Opens instantly in Chrome</td>
+                            <td class="cell-opuspad">✅</td>
+                            <td>✅</td>
+                            <td>❌ Separate app</td>
+                            <td>❌ Requires upload</td>
+                        </tr>
+                        <tr>
+                            <td>Renders Markdown beautifully</td>
+                            <td class="cell-opuspad">✅</td>
+                            <td>❌ Raw tags</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                        </tr>
+                        <tr>
+                            <td>Edits save to local disk</td>
+                            <td class="cell-opuspad">✅</td>
+                            <td>❌</td>
+                            <td>✅</td>
+                            <td>❌ Cloud only</td>
+                        </tr>
+                        <tr>
+                            <td>Zero setup / install</td>
+                            <td class="cell-opuspad">✅ Chrome extension</td>
+                            <td>✅</td>
+                            <td>❌ App + plugins</td>
+                            <td>✅</td>
+                        </tr>
+                        <tr>
+                            <td>No cloud upload required</td>
+                            <td class="cell-opuspad">✅</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                            <td>❌</td>
+                        </tr>
+                        <tr>
+                            <td>Source mode for complex Markdown</td>
+                            <td class="cell-opuspad">✅</td>
+                            <td>❌</td>
+                            <td>✅</td>
+                            <td>❌</td>
+                        </tr>
+                        <tr>
+                            <td>Auto-reloads on external changes</td>
+                            <td class="cell-opuspad">✅</td>
+                            <td>❌</td>
+                            <td>✅</td>
+                            <td>N/A</td>
+                        </tr>
+                        <tr>
+                            <td>Lightweight (no Electron)</td>
+                            <td class="cell-opuspad">✅</td>
+                            <td>✅</td>
+                            <td>❌ Electron</td>
+                            <td>✅</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="faq fade-in section-spacing">
+            <div class="section-title">
+                <h2>Questions</h2>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Does OpusPad upload my files anywhere?</h3>
+                <p>Never. OpusPad is strictly local-first. It reads and writes directly to your local drive using Chrome's File System Access API. There is no server, no cloud sync, and no telemetry.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Is this a note-taking app?</h3>
+                <p>No. We don't do wikis, backlinks, or graph views. OpusPad does one thing well: it makes local Markdown files fast to open, easy to read, and simple to edit.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Does it handle complex Markdown from Claude or Cursor?</h3>
+                <p>Yes. OpusPad handles tables, nested lists, code blocks, and more. If something is too complex for the WYSIWYG editor, the compatibility guard automatically falls back to source mode so nothing gets mangled.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Can I use it alongside other editors?</h3>
+                <p>Absolutely. When an external tool (or AI agent) modifies a file on disk, OpusPad detects the change and reloads the latest version automatically.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Is it free?</h3>
+                <p>Yes. OpusPad is free and open source.</p>
+            </div>
+        </section>
+
+        <section class="closing-cta fade-in">
+            <div class="container">
+                <h2>Stop squinting at raw Markdown.</h2>
+                <p>Get the lightweight, local-first editor built for reviewing AI agent outputs.</p>
+                <a href="https://chromewebstore.google.com/detail/opuspad/ephlhjlnpnjjnjgdohdnbknadhklcoag" class="btn btn-primary" style="background: white; color: var(--dark-bg);">
+                    Add to Chrome — It's Free
+                </a>
+            </div>
+        </section>
     </main>
 
     <footer>
@@ -403,5 +775,35 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Intersection Observer for Fade-in Animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(element => {
+            observer.observe(element);
+        });
+    </script>
 </body>
 </html>
