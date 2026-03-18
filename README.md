@@ -1,6 +1,4 @@
-# OpusPad
-    
-**A local-first, WYSIWYG Markdown editor for Chrome, built for the AI era.**
+# OpusPad: A local-first, WYSIWYG Markdown editor for Chrome, built for the AI era
     
 ![OpusPad Main Screenshot](docs/stock_check_md_1_rich.png) 
     
