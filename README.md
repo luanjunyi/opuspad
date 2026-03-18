@@ -4,6 +4,8 @@
     
 ## Value Proposition
 OpusPad transforms your Chrome browser into a robust local file editor with a Notion-like WYSIWYG experience. Seamlessly edit Markdown files (like CLAUDE.md, specs, or READMEs) stored on your local disk, without needing to open a full IDE or rely on cloud services.
+
+**🌐 Website:** [editor.dull.business](https://editor.dull.business)
     
 ## Why OpusPad?
 - **Local-First:** Your files stay on your disk. No cloud storage, no unnecessary uploads.
@@ -13,8 +15,6 @@ OpusPad transforms your Chrome browser into a robust local file editor with a No
 - **Lightweight:** No need for heavy IDEs just to edit a few Markdown files.
     
 ## Installation
-
-**🌐 Website:** [editor.dull.business](https://editor.dull.business)
     
 ### 1. Chrome Web Store (Recommended)
 Install OpusPad directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/opuspad/ephlhjlnpnjjnjgdohdnbknadhklcoag).
