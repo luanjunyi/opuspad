@@ -1,8 +1,8 @@
 # OpusPad
     
-*A local-first, WYSIWYG Markdown editor for Chrome, built for the AI era.*
+**A local-first, WYSIWYG Markdown editor for Chrome, built for the AI era.**
     
-![OpusPad Main Screenshot](./docs/images/main_screenshot.png) <!-- Placeholder, update path later -->
+![OpusPad Main Screenshot](docs/stock_check_md_1_rich.png) 
     
 ## Value Proposition
 OpusPad transforms your Chrome browser into a robust local file editor with a Notion-like WYSIWYG experience. Seamlessly edit Markdown files (like CLAUDE.md, specs, or READMEs) stored on your local disk, without needing to open a full IDE or rely on cloud services.
