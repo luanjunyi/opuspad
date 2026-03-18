@@ -13,6 +13,8 @@ OpusPad transforms your Chrome browser into a robust local file editor with a No
 - **Lightweight:** No need for heavy IDEs just to edit a few Markdown files.
     
 ## Installation
+
+**🌐 Website:** [editor.dull.business](https://editor.dull.business)
     
 ### 1. Chrome Web Store (Recommended)
 Install OpusPad directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/opuspad/ephlhjlnpnjjnjgdohdnbknadhklcoag).
