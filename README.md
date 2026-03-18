@@ -1,64 +1,58 @@
 # OpusPad
-
-![OpusPad Promo Tile](./store_assets/marquee_promo_tile.png)
-
-OpusPad is a Chrome Extension that transforms your browser into a robust local file system editor, bridging the gap between humans and AI agents. It features a dual-editor architecture: a Notion-like WYSIWYG block editor for Markdown files (designed as the perfect medium for human-AI collaboration), and a code editor for plain text and data files. 
-
-## Features
-
-- **Local File System Access:** Mounts a local folder directly in Chrome using the native File System Access API.
-- **WYSIWYG Markdown Editor:** Uses BlockNote to provide a Notion-like block editing experience for compatible Markdown files.
-- **Code Editor:** Uses CodeMirror for editing plain text, JSON, JS, and incompatible Markdown files with syntax highlighting.
-- **Markdown Compatibility Guard:** Ensures no silent data loss occurs during Markdown import/export. Incompatible files (e.g., those containing complex tables or HTML) safely fall back to the source code editor.
-- **Auto-save:** Seamless, debounced auto-saving back to the local disk without download prompts.
-- **Lazy-loading Sidebar:** Efficiently navigates local directories by only loading nested folders when expanded.
-- **Binary File Rejection:** Safely prevents opening and editing of unsupported binary files.
-
-## Installation
-
-To install the extension locally for development or personal use:
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/luanjunyi/md-editor-in-chrome.git
-   cd md-editor-chrome
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Build the extension:**
-   ```bash
-   npm run build
-   ```
-   *This will generate a `dist/` directory containing the compiled Chrome Extension.*
-
-4. **Load into Chrome:**
-   - Open Google Chrome and navigate to `chrome://extensions/`.
-   - Enable **Developer mode** using the toggle switch in the top right corner.
-   - Click the **Load unpacked** button.
-   - Select the `dist` directory generated in the previous step.
-
-## Usage & Permissions
-
-1. **Open the Editor:** Pin the extension to your Chrome toolbar and click the icon. The editor will open in a new full-screen tab.
-2. **Mount a Workspace:** Click the **Open Folder** button in the center of the screen.
-3. **Grant Permissions:** 
-   - A native browser directory picker will appear. Select a local folder you want to edit.
-   - Chrome will prompt you for permissions (e.g., "Let site view files?" and "Let site save changes?"). You must grant **read/write** permissions for the extension to save files automatically.
-4. **Edit:** 
-   - Navigate your files using the left sidebar. 
-   - Click a `.md` file to open it in the WYSIWYG editor. 
-   - Click a `.txt` or `.json` file to open it in the code editor. 
-   - Changes are auto-saved to your local disk after half a second of inactivity.
-
-## Tech Stack
-
-- **Framework:** React 18, TypeScript, Vite
-- **Extension Build:** `@crxjs/vite-plugin` (Manifest V3)
-- **Markdown Editor:** [BlockNote](https://www.blocknotejs.org/) (built on ProceMirror/Tiptap)
-- **Text/Code Editor:** [CodeMirror 6](https://codemirror.net/) (`@uiw/react-codemirror`)
-- **Testing:** Vitest (Unit) and Playwright (E2E)
-- **Icons:** Lucide React
+    *A local-first, WYSIWYG Markdown editor for Chrome, built for the AI era.*
+    
+    ![OpusPad Main Screenshot](./docs/images/main_screenshot.png) <!-- Placeholder, update path later -->
+    
+    ## Value Proposition
+    OpusPad transforms your Chrome browser into a robust local file editor with a Notion-like WYSIWYG experience. Seamlessly edit Markdown files (like CLAUDE.md, specs, or READMEs) stored on your local disk, without needing to open a full IDE or rely on cloud services.
+    
+    ## Why OpusPad?
+    - **Local-First:** Your files stay on your disk. No cloud storage, no unnecessary uploads.
+    - **WYSIWYG & Source Mode:** Enjoy a beautiful Notion-like editing experience, or switch to the raw Markdown source mode when needed.
+    - **AI-Ready:** Perfect for managing and editing AI-generated content and specifications, like CLAUDE.md files, directly where you work.
+    - **Chrome Integrated:** Leverages the native File System Access API for direct local file manipulation.
+    - **Lightweight:** No need for heavy IDEs just to edit a few Markdown files.
+    
+    ## Installation
+    
+    **1. Chrome Web Store (Recommended):**
+       - Install OpusPad directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/opuspad/ephlhjlnpnjjnjgdohdnbknadhklcoag).
+    
+    **2. Developer Setup (for local development):**
+       - Clone the repository: `git clone https://github.com/luanjunyi/md-editor-in-chrome.git`
+       - Navigate to the directory: `cd md-editor-in-chrome`
+       - Install dependencies: `npm install`
+       - Build the extension: `npm run build` (This will generate a `dist/` directory)
+       - Load into Chrome:
+           - Open Chrome and navigate to `chrome://extensions/`.
+           - Enable "Developer mode".
+           - Click "Load unpacked" and select the `dist/` directory.
+    
+    ## Use Cases
+    - Editing `CLAUDE.md` files for AI agent instructions.
+    - Managing local specification documents.
+    - Quickly updating `README.md` files.
+    - Any task requiring local Markdown file editing within Chrome.
+    
+    ## Privacy
+    OpusPad is truly local-first. It does not send your file content to any cloud server. All file processing happens locally in your browser.
+    
+    ## Limitations
+    - Not a full IDE: OpusPad is focused on Markdown editing and does not provide full development environment features.
+    - Binary Files: Designed for text-based files, primarily Markdown. It safely prevents opening unsupported binary files.
+    
+    ## Developer Setup
+    (Content from old "Installation" section - clone, install, build, load)
+    - Clone the repository: `git clone https://github.com/luanjunyi/md-editor-in-chrome.git`
+    - Navigate to the directory: `cd md-editor-in-chrome`
+    - Install dependencies: `npm install`
+    - Build the extension: `npm run build`
+    - Load into Chrome: Open `chrome://extensions/`, enable Developer mode, click "Load unpacked", select `dist/`.
+    
+    
+    ## Tech Stack
+    - Vue 3
+    - BlockNote
+    - CodeMirror
+    - Native File System Access API
+    
