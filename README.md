@@ -43,7 +43,7 @@ OpusPad is truly local-first. It does not send your file content to any cloud se
 - **Binary Files:** Designed for text-based files, primarily Markdown. It safely prevents opening unsupported binary files.
     
 ## Tech Stack
-- NextJS
+- React + Vite
 - BlockNote
 - CodeMirror
 - Native File System Access API

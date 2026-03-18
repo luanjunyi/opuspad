@@ -12,16 +12,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/luanjunyi/md-editor-in-chrome.git"
+    "url": "git+https://github.com/luanjunyi/opuspad.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/luanjunyi/md-editor-in-chrome/issues"
+    "url": "https://github.com/luanjunyi/opuspad/issues"
   },
-  "homepage": "https://github.com/luanjunyi/md-editor-in-chrome#readme",
+  "homepage": "https://github.com/luanjunyi/opuspad#readme",
   "dependencies": {
     "@blocknote/core": "^0.47.1",
     "@blocknote/mantine": "^0.47.1",
