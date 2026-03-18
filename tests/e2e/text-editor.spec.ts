@@ -28,3 +28,32 @@ test('text editor routes correctly and auto saves', async ({ page }) => {
   await expect(page.locator('.cm-editor')).toBeVisible();
   await expect(page.locator('text="Source mode recommended"')).toBeVisible();
 });
+
+test('source editor stays mounted while editing', async ({ page }) => {
+  await page.goto('/?fs=mock');
+
+  await page.click('text="Open Fixture Workspace"');
+  await page.click('text="notes-with-table.md"');
+  await page.click('text="Open source"');
+
+  const editor = page.locator('.cm-editor');
+  const content = page.locator('.cm-content');
+
+  await expect(editor).toBeVisible();
+  await content.click();
+  await page.keyboard.type(' stable');
+
+  await editor.evaluate((node) => {
+    node.setAttribute('data-refresh-probe', 'stable-editor');
+  });
+
+  await page.waitForTimeout(3200);
+
+  await expect(content).toContainText('stable');
+  await expect(editor).toHaveAttribute('data-refresh-probe', 'stable-editor');
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.activeElement?.closest('.cm-editor') !== null)
+    )
+    .toBe(true);
+});

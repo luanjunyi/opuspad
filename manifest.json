@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "OpusPad",
-  "version": "1.2",
+  "version": "1.2.1",
   "description": "Review and edit local Markdown files in Chrome. WYSIWYG + source mode. 100% private, zero uploads. Built for AI-indigenous builders.",
   "action": {
     "default_popup": "popup.html",

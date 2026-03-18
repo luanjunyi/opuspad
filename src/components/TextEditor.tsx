@@ -15,6 +15,36 @@ interface TextEditorProps {
   onDirty: () => void;
 }
 
+const JSON_EXTENSIONS = [json()];
+const PYTHON_EXTENSIONS = [python()];
+const JAVASCRIPT_EXTENSIONS = [javascript()];
+const JSX_EXTENSIONS = [javascript({ jsx: true })];
+const TYPESCRIPT_EXTENSIONS = [javascript({ typescript: true })];
+const TSX_EXTENSIONS = [javascript({ jsx: true, typescript: true })];
+const MARKDOWN_EXTENSIONS = [markdown()];
+const PLAIN_TEXT_EXTENSIONS: [] = [];
+
+function getExtensionsForPath(path: string) {
+  switch (getSourceLanguage(path)) {
+    case 'json':
+      return JSON_EXTENSIONS;
+    case 'python':
+      return PYTHON_EXTENSIONS;
+    case 'javascript':
+      return JAVASCRIPT_EXTENSIONS;
+    case 'jsx':
+      return JSX_EXTENSIONS;
+    case 'typescript':
+      return TYPESCRIPT_EXTENSIONS;
+    case 'tsx':
+      return TSX_EXTENSIONS;
+    case 'markdown':
+      return MARKDOWN_EXTENSIONS;
+    default:
+      return PLAIN_TEXT_EXTENSIONS;
+  }
+}
+
 export function TextEditor({ activeFile, reloadNonce = 0, onSave, onDirty }: TextEditorProps) {
   const fileState = activeFile.state;
   
@@ -101,27 +131,6 @@ export function TextEditor({ activeFile, reloadNonce = 0, onSave, onDirty }: Tex
     };
   }, []);
 
-  const getExtensions = () => {
-    switch (getSourceLanguage(fileState.path)) {
-      case 'json':
-        return [json()];
-      case 'python':
-        return [python()];
-      case 'javascript':
-        return [javascript()];
-      case 'jsx':
-        return [javascript({ jsx: true })];
-      case 'typescript':
-        return [javascript({ typescript: true })];
-      case 'tsx':
-        return [javascript({ jsx: true, typescript: true })];
-      case 'markdown':
-        return [markdown()];
-      default:
-        return [];
-    }
-  };
-
   const onChange = useCallback((val: string) => {
     latestContentRef.current = val;
     onDirtyRef.current();
@@ -148,7 +157,7 @@ export function TextEditor({ activeFile, reloadNonce = 0, onSave, onDirty }: Tex
         <CodeMirror
           value={content}
           height="100%"
-          extensions={getExtensions()}
+          extensions={getExtensionsForPath(fileState.path)}
           onChange={onChange}
         />
       </div>

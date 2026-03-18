@@ -8,7 +8,6 @@ import { applySavedTextFileState } from './utils/activeFileSave';
 const DEFAULT_SIDEBAR_WIDTH = 300;
 const MIN_SIDEBAR_WIDTH = 220;
 const MAX_SIDEBAR_WIDTH = 540;
-const WORKSPACE_RELOAD_INTERVAL_MS = 2000;
 
 export default function App() {
   const [rootHandle, setRootHandle] = useState<FileSystemDirectoryHandle | null>(null);
@@ -286,20 +285,6 @@ export default function App() {
 
   const handleReloadWorkspace = useCallback(async () => {
     await reloadWorkspace(rootHandle);
-  }, [reloadWorkspace, rootHandle]);
-
-  useEffect(() => {
-    if (!rootHandle) {
-      return;
-    }
-
-    const intervalId = window.setInterval(() => {
-      void reloadWorkspace(rootHandle);
-    }, WORKSPACE_RELOAD_INTERVAL_MS);
-
-    return () => {
-      window.clearInterval(intervalId);
-    };
   }, [reloadWorkspace, rootHandle]);
 
   const renderSaveIndicator = () => {

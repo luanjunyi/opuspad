@@ -134,4 +134,32 @@ describe('TextEditor', () => {
 
     expect(screen.getByTestId('code-editor')).toHaveValue('hello from disk');
   });
+
+  it('keeps the same CodeMirror extensions for unrelated rerenders of the same file', () => {
+    const { rerender } = render(
+      <TextEditor
+        activeFile={createActiveFile('notes.md', 'hello')}
+        reloadNonce={0}
+        onSave={vi.fn()}
+        onDirty={vi.fn()}
+      />
+    );
+
+    const firstProps =
+      codeMirrorMock.renderCodeMirror.mock.calls[codeMirrorMock.renderCodeMirror.mock.calls.length - 1]?.[0];
+
+    rerender(
+      <TextEditor
+        activeFile={createActiveFile('notes.md', 'hello')}
+        reloadNonce={0}
+        onSave={vi.fn()}
+        onDirty={vi.fn()}
+      />
+    );
+
+    const secondProps =
+      codeMirrorMock.renderCodeMirror.mock.calls[codeMirrorMock.renderCodeMirror.mock.calls.length - 1]?.[0];
+
+    expect(secondProps.extensions).toBe(firstProps.extensions);
+  });
 });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, createEvent, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import type { FileNode, LoadFileResult } from './types';
 
@@ -87,6 +87,7 @@ vi.mock('./components/EditorRouter', () => ({
       {activeFile.state.kind === 'text' ? (
         <div data-testid="active-content">{activeFile.state.content}</div>
       ) : null}
+      <input aria-label="Mock editor focus surface" />
       <button onClick={() => onDirty()}>Dirty</button>
       <button onClick={() => onSave(`saved:${activeFile.node.path}`)}>Save</button>
     </div>
@@ -111,6 +112,10 @@ describe('App', () => {
     mockFsService.writeFile.mockResolvedValue(undefined);
     window.history.replaceState({}, '', '/');
     document.title = 'OpusPad';
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('renders headline', () => {
@@ -318,63 +323,53 @@ describe('App', () => {
     expect(saveEvent.defaultPrevented).toBe(true);
   });
 
-  it('auto reloads the active file every 2 seconds when there are no local edits', async () => {
-    vi.useFakeTimers();
+  it('reloads the active file when the reload button is pressed', async () => {
     mockFsService.readEditableFile
       .mockResolvedValueOnce(createTextState(alphaNode.path, 'alpha'))
       .mockResolvedValueOnce(createTextState(alphaNode.path, 'alpha updated elsewhere'));
 
+    const user = userEvent.setup();
     render(<App />);
 
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Open Folder' }));
-      await Promise.resolve();
-    });
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: alphaNode.name }));
-      await Promise.resolve();
-    });
+    await user.click(screen.getByRole('button', { name: 'Open Folder' }));
+    await screen.findByRole('button', { name: alphaNode.name });
+    await user.click(screen.getByRole('button', { name: alphaNode.name }));
 
     expect(screen.getByTestId('active-content')).toHaveTextContent('alpha');
 
-    await act(async () => {
-      vi.advanceTimersByTime(2000);
-      await Promise.resolve();
-    });
+    await user.click(screen.getByRole('button', { name: 'Reload workspace' }));
 
-    expect(screen.getByTestId('active-content')).toHaveTextContent('alpha updated elsewhere');
-    vi.useRealTimers();
+    await waitFor(() => {
+      expect(screen.getByTestId('active-content')).toHaveTextContent('alpha updated elsewhere');
+    });
   });
 
-  it('auto reloads the mounted tree every 2 seconds when files are added externally', async () => {
-    vi.useFakeTimers();
+  it('reloads the mounted tree when the reload button is pressed', async () => {
     const gammaNode = createFileNode('gamma.txt');
     mockFsService.readDirectory
       .mockResolvedValueOnce([alphaNode, betaNode])
       .mockResolvedValueOnce([alphaNode, betaNode, gammaNode]);
 
+    const user = userEvent.setup();
     render(<App />);
 
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Open Folder' }));
-      await Promise.resolve();
-    });
+    await user.click(screen.getByRole('button', { name: 'Open Folder' }));
+    await screen.findByRole('button', { name: alphaNode.name });
 
     expect(screen.getByRole('button', { name: alphaNode.name })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: gammaNode.name })).not.toBeInTheDocument();
 
-    await act(async () => {
-      vi.advanceTimersByTime(2000);
-      await Promise.resolve();
-    });
+    await user.click(screen.getByRole('button', { name: 'Reload workspace' }));
 
-    expect(screen.getByRole('button', { name: gammaNode.name })).toBeInTheDocument();
-    vi.useRealTimers();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: gammaNode.name })).toBeInTheDocument();
+    });
   });
 
   it('renders the mode toggle before the reload button in the sticky toolbar', async () => {
+    mockFsService.readEditableFile.mockReset();
     mockFsService.readEditableFile.mockResolvedValue(createMarkdownState('notes.md', '# notes'));
+    mockFsService.readDirectory.mockReset();
     mockFsService.readDirectory.mockResolvedValue([createFileNode('notes.md')]);
 
     const user = userEvent.setup();
