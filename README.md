@@ -1,50 +1,50 @@
 # OpusPad
     
-    *A local-first, WYSIWYG Markdown editor for Chrome, built for the AI era.*
+*A local-first, WYSIWYG Markdown editor for Chrome, built for the AI era.*
     
-    ![OpusPad Main Screenshot](./docs/images/main_screenshot.png) <!-- Placeholder, update path later -->
+![OpusPad Main Screenshot](./docs/images/main_screenshot.png) <!-- Placeholder, update path later -->
     
-    ## Value Proposition
-    OpusPad transforms your Chrome browser into a robust local file editor with a Notion-like WYSIWYG experience. Seamlessly edit Markdown files (like CLAUDE.md, specs, or READMEs) stored on your local disk, without needing to open a full IDE or rely on cloud services.
+## Value Proposition
+OpusPad transforms your Chrome browser into a robust local file editor with a Notion-like WYSIWYG experience. Seamlessly edit Markdown files (like CLAUDE.md, specs, or READMEs) stored on your local disk, without needing to open a full IDE or rely on cloud services.
     
-    ## Why OpusPad?
-    - **Local-First:** Your files stay on your disk. No cloud storage, no unnecessary uploads.
-    - **WYSIWYG & Source Mode:** Enjoy a beautiful Notion-like editing experience, or switch to the raw Markdown source mode when needed.
-    - **AI-Ready:** Perfect for managing and editing AI-generated content and specifications, like CLAUDE.md files, directly where you work.
-    - **Chrome Integrated:** Leverages the native File System Access API for direct local file manipulation.
-    - **Lightweight:** No need for heavy IDEs just to edit a few Markdown files.
+## Why OpusPad?
+- **Local-First:** Your files stay on your disk. No cloud storage, no unnecessary uploads.
+- **WYSIWYG & Source Mode:** Enjoy a beautiful Notion-like editing experience, or switch to the raw Markdown source mode when needed.
+- **AI-Ready:** Perfect for managing and editing AI-generated content and specifications, like CLAUDE.md files, directly where you work.
+- **Chrome Integrated:** Leverages the native File System Access API for direct local file manipulation.
+- **Lightweight:** No need for heavy IDEs just to edit a few Markdown files.
     
-    ## Installation
+## Installation
     
-    ### 1. Chrome Web Store (Recommended)
-    Install OpusPad directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/opuspad/ephlhjlnpnjjnjgdohdnbknadhklcoag).
+### 1. Chrome Web Store (Recommended)
+Install OpusPad directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/opuspad/ephlhjlnpnjjnjgdohdnbknadhklcoag).
     
-    ### 2. Developer Setup (for local development)
-    1. Clone the repository: `git clone https://github.com/luanjunyi/opuspad.git`
-    2. Navigate to the directory: `cd opuspad`
-    3. Install dependencies: `npm install`
-    4. Build the extension: `npm run build` (This will generate a `dist/` directory)
-    5. Load into Chrome:
-       - Open Chrome and navigate to `chrome://extensions/`.
-       - Enable "Developer mode".
-       - Click "Load unpacked" and select the `dist/` directory.
+### 2. Developer Setup (for local development)
+1. Clone the repository: `git clone https://github.com/luanjunyi/opuspad.git`
+2. Navigate to the directory: `cd opuspad`
+3. Install dependencies: `npm install`
+4. Build the extension: `npm run build` (This will generate a `dist/` directory)
+5. Load into Chrome:
+    - Open Chrome and navigate to `chrome://extensions/`.
+    - Enable "Developer mode".
+    - Click "Load unpacked" and select the `dist/` directory.
     
-    ## Use Cases
-    - Editing `CLAUDE.md` files for AI agent instructions.
-    - Managing local specification documents.
-    - Quickly updating `README.md` files.
-    - Any task requiring local Markdown file editing within Chrome.
+## Use Cases
+- Editing `CLAUDE.md` files for AI agent instructions.
+- Managing local specification documents.
+- Quickly updating `README.md` files.
+- Any task requiring local Markdown file editing within Chrome.
     
-    ## Privacy
-    OpusPad is truly local-first. It does not send your file content to any cloud server. All file processing happens locally in your browser.
+## Privacy
+OpusPad is truly local-first. It does not send your file content to any cloud server. All file processing happens locally in your browser.
     
-    ## Limitations
-    - **Not a full IDE:** OpusPad is focused on Markdown editing and does not provide full development environment features.
-    - **Binary Files:** Designed for text-based files, primarily Markdown. It safely prevents opening unsupported binary files.
+## Limitations
+- **Not a full IDE:** OpusPad is focused on Markdown editing and does not provide full development environment features.
+- **Binary Files:** Designed for text-based files, primarily Markdown. It safely prevents opening unsupported binary files.
     
-    ## Tech Stack
-    - Vue 3
-    - BlockNote
-    - CodeMirror
-    - Native File System Access API
+## Tech Stack
+- NextJS
+- BlockNote
+- CodeMirror
+- Native File System Access API
     
