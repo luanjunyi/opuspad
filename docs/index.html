@@ -170,8 +170,33 @@
             font-size: 1.15rem;
             color: var(--text-secondary);
             max-width: 700px;
-            margin: 0 auto 40px;
+            margin: 0 auto 32px;
             font-weight: 400;
+        }
+
+        .hero-support-points {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px 24px;
+            margin: 0 auto 40px;
+            padding: 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .hero-support-points li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hero-support-points li::before {
+            content: "✓";
+            color: var(--accent);
+            font-weight: 700;
         }
 
         .cta-group {
@@ -661,6 +686,7 @@
             <button class="menu-toggle" aria-label="Toggle menu">☰</button>
             <div class="nav-links">
                 <a href="#features">Features</a>
+                <a href="#how-to-use">How to Use</a>
                 <a href="https://github.com/luanjunyi/md-editor-in-chrome" target="_blank">Source</a>
                 <a href="privacy/">Privacy</a>
             </div>
@@ -671,8 +697,16 @@
         <div class="container section-spacing">
             <div class="hero">
                 <div class="badge">Chrome Extension — Free & Open Source</div>
-                <h1>Editor for AI-Human collaboration, in your browser</h1>
-                <p class="subtitle">Built for AI-indigenous builders. No sign-ups, no uploads. Open, review, and edit your Markdown files instantly—WYSIWYG or source mode. Works with other text formats too with highlights.</p>
+                <h1>The editor for spec-driven development</h1>
+                <p class="subtitle">Write specs, steer agents, and refine Markdown artifacts locally in your browser. OpusPad gives you a fast, readable workspace for the files that drive AI-assisted software development.</p>
+                
+                <ul class="hero-support-points">
+                    <li>Local-first</li>
+                    <li>No sign-up</li>
+                    <li>No upload</li>
+                    <li>WYSIWYG + source mode</li>
+                    <li>Built for agent workflows</li>
+                </ul>
                 
                 <div class="cta-group">
                     <a href="https://chromewebstore.google.com/detail/opuspad/ephlhjlnpnjjnjgdohdnbknadhklcoag" class="btn btn-primary">
@@ -726,61 +760,69 @@
                 </div>
             </div>
 
+            <section class="container fade-in section-spacing" id="spec-driven">
+                <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 48px; max-width: 800px; margin: 0 auto; text-align: center;">
+                    <h2 style="font-size: 2rem; margin-bottom: 32px;">How OpusPad fits spec-driven development</h2>
+                    <ul style="list-style: none; text-align: left; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; font-size: 1.1rem; padding: 0;">
+                        <li style="display: flex; gap: 12px; align-items: flex-start;"><span style="color: var(--accent);">✦</span> Draft specs in readable Markdown</li>
+                        <li style="display: flex; gap: 12px; align-items: flex-start;"><span style="color: var(--accent);">✦</span> Review agent-generated plans and task files</li>
+                        <li style="display: flex; gap: 12px; align-items: flex-start;"><span style="color: var(--accent);">✦</span> Edit implementation notes without breaking formatting</li>
+                        <li style="display: flex; gap: 12px; align-items: flex-start;"><span style="color: var(--accent);">✦</span> Stay synced when tools update files externally</li>
+                        <li style="display: flex; gap: 12px; align-items: flex-start;"><span style="color: var(--accent);">✦</span> Keep everything local and repo-native</li>
+                    </ul>
+                </div>
+            </section>
+
             <div class="section-title fade-in" id="features">
-                <h2>Everything you need. Nothing you don't.</h2>
-                <p>OpusPad does one thing well: make your local Markdown files fast to open, easy to read, and simple to edit.</p>
+                <h2>Everything you need for spec-driven workflows</h2>
+                <p>OpusPad does one thing well: make your local spec artifacts fast to review, edit, and verify alongside your agents.</p>
             </div>
 
             <div class="features section-spacing">
                 <div class="feature-card fade-in">
                     <div class="feature-icon">✍️</div>
                     <h3>WYSIWYG Editing</h3>
-                    <p>A clean block editor for natural reading and editing. Tables, code blocks, and lists render beautifully — not as raw tags.</p>
-                </div>
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">🔒</div>
-                    <h3>100% Private</h3>
-                    <p>Zero telemetry. Zero uploads. Zero data collection. Your code specs never leave your machine.</p>
-                </div>
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">🔓</div>
-                    <h3>Open Source</h3>
-                    <p>Built in the open. Inspect the source code, verify its security, or contribute improvements on GitHub.</p>
-                </div>
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">📡</div>
-                    <h3>External Change Detection</h3>
-                    <p>When an AI agent updates a file on disk, OpusPad detects the change and reloads automatically. Stay in sync without switching windows.</p>
-                </div>
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">🔄</div>
-                    <h3>Auto Save</h3>
-                    <p>Your edits are saved to disk automatically. No manual Ctrl+S required — just type and it persists.</p>
-                </div>
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">📂</div>
-                    <h3>Local File Access</h3>
-                    <p>Open any folder from your disk. Read and write directly using Chrome's native File System API. No cloud, no middleman.</p>
+                    <p>Review specs and generated plans without the overhead of raw Markdown noise. Tables, code blocks, and lists render beautifully.</p>
                 </div>
                 <div class="feature-card fade-in">
                     <div class="feature-icon">💻</div>
                     <h3>Source Mode</h3>
-                    <p>Drop down to raw Markdown when syntax gets complex. Full CodeMirror editor with syntax highlighting.</p>
+                    <p>Drop down to raw Markdown for precise edits when structure and document formatting matter.</p>
                 </div>
                 <div class="feature-card fade-in">
-                    <div class="feature-icon">📁</div>
-                    <h3>Directory Sidebar</h3>
-                    <p>Browse your project's file tree with a collapsible sidebar. Smart fuzzy search lets you jump to any file instantly.</p>
+                    <div class="feature-icon">📡</div>
+                    <h3>External Change Detection</h3>
+                    <p>When an agent updates your project tracker or <code>CLAUDE.md</code> on disk, OpusPad reloads instantly. Stay seamlessly in sync.</p>
                 </div>
                 <div class="feature-card fade-in">
-                    <div class="feature-icon">➕</div>
-                    <h3>File Management</h3>
-                    <p>Create new Markdown files and delete old ones directly from the sidebar. No need to open a terminal.</p>
+                    <div class="feature-icon">📂</div>
+                    <h3>Local File Access</h3>
+                    <p>Work directly with your repo artifacts. Open any local folder and read/write directly using Chrome's native File System API.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔒</div>
+                    <h3>100% Private</h3>
+                    <p>Your sensitive specs, prompts, and architecture documents stay on your machine. Zero telemetry. Zero uploads.</p>
                 </div>
                 <div class="feature-card fade-in">
                     <div class="feature-icon">⚡</div>
                     <h3>Lightweight</h3>
-                    <p>No Electron overhead. Runs natively inside Chrome. Opens instantly. Closes cleanly. Stays out of your way.</p>
+                    <p>Optimized for quick review loops, not general note-taking fluff. Opens instantly without Electron overhead.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Auto Save</h3>
+                    <p>Your edits are saved to disk automatically. Refine a spec and your agent immediately sees the updated file.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">📁</div>
+                    <h3>Directory Sidebar</h3>
+                    <p>Browse your project's spec folders. Smart fuzzy search lets you jump between design docs and implementation notes instantly.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔓</div>
+                    <h3>Open Source</h3>
+                    <p>Built in the open for developers. Inspect the source code, verify its security, or contribute your own workflow improvements.</p>
                 </div>
             </div>
         </div>
@@ -791,31 +833,31 @@
                 
                 <div class="panel fade-in">
                     <div class="panel-content">
-                        <h3>Built for Agent Workflows</h3>
-                        <p>AI coding agents generate a massive amount of Markdown — architecture plans, <code>CLAUDE.md</code> rulesets, implementation notes. OpusPad gives you an instant, readable interface to review and refine these documents without breaking your flow.</p>
+                        <h3>Specs are Working Artifacts</h3>
+                        <p>In AI-assisted development, specs are no longer optional notes. Agents read specs, generate plans, update task lists, and write implementation notes. Humans still need a clean place to review, edit, and verify those artifacts.</p>
                     </div>
                     <div class="panel-illustration">
-                        AI → Markdown → You
+                        The Spec Sandbox 
                     </div>
                 </div>
 
                 <div class="panel fade-in" style="flex-direction: row-reverse;">
                     <div class="panel-content">
-                        <h3>The Missing Middle Ground</h3>
-                        <p>TextEdit shows you raw tags. VS Code is overkill for a quick review. Cloud editors require an upload. OpusPad sits in the sweet spot: browser-native, local-first, and purpose-built for reading Markdown the way it was meant to be seen.</p>
+                        <h3>The Review Loop</h3>
+                        <p>Spec-driven development only works if specs stay readable and editable. Agents can generate the draft, but humans still need to inspect, refine, and trust the artifact. OpusPad makes that loop fast by turning raw Markdown into something you can actually work with.</p>
                     </div>
                     <div class="panel-illustration">
-                        Not too heavy.<br>Not too simple.
+                        Agents Draft.<br>Humans Refine.
                     </div>
                 </div>
 
                 <div class="panel fade-in">
                     <div class="panel-content">
-                        <h3>Written Communication with AI</h3>
-                        <p>The best AI workflows are conversational — you write specs, the agent implements, you review the output, and iterate. OpusPad makes that review/edit step frictionless. Open a file, refine the text, save. Back to your agent in seconds.</p>
+                        <h3>Repo-Native Review</h3>
+                        <p>TextEdit shows you raw tags. Cloud editors require an upload. OpusPad sits in the sweet spot: browser-native, local-first, and purpose-built for reading and editing the Markdown files already in your repository.</p>
                     </div>
                     <div class="panel-illustration">
-                        Iterate Faster
+                        Local First
                     </div>
                 </div>
             </div>
@@ -823,7 +865,8 @@
 
         <section class="comparison container section-spacing fade-in">
             <div class="section-title">
-                <h2>How OpusPad compares</h2>
+                <h2>The right tool for spec reviews</h2>
+                <p>OpusPad is customized for agent-written Markdown, not general note-taking.</p>
             </div>
             <div class="table-wrapper">
                 <table>
@@ -831,70 +874,81 @@
                         <tr>
                             <th>Feature</th>
                             <th class="cell-opuspad">OpusPad</th>
-                            <th>Raw Browser</th>
-                            <th>VS Code / Obsidian</th>
+                            <th>IDE (VS Code)</th>
+                            <th>Note Apps (Obsidian)</th>
                             <th>Cloud Docs</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Opens instantly in Chrome</td>
+                            <td>Primary Focus</td>
+                            <td class="cell-opuspad">Spec Review & Editing</td>
+                            <td>Code Authoring</td>
+                            <td>Knowledge Graphs</td>
+                            <td>Collaborative Writing</td>
+                        </tr>
+                        <tr>
+                            <td>Opens instantly in browser</td>
                             <td class="cell-opuspad">✅</td>
-                            <td>✅</td>
+                            <td>❌ Heavy</td>
                             <td>❌ Separate app</td>
-                            <td>❌ Requires upload</td>
+                            <td>❌ Multi-step</td>
                         </tr>
                         <tr>
-                            <td>Renders Markdown beautifully</td>
-                            <td class="cell-opuspad">✅</td>
-                            <td>❌ Raw tags</td>
-                            <td>✅</td>
-                            <td>✅</td>
-                        </tr>
-                        <tr>
-                            <td>Edits save to local disk</td>
-                            <td class="cell-opuspad">✅</td>
-                            <td>❌</td>
-                            <td>✅</td>
-                            <td>❌ Cloud only</td>
-                        </tr>
-                        <tr>
-                            <td>Zero setup / install</td>
-                            <td class="cell-opuspad">✅ Chrome extension</td>
-                            <td>✅</td>
-                            <td>❌ App + plugins</td>
-                            <td>✅</td>
-                        </tr>
-                        <tr>
-                            <td>No cloud upload required</td>
+                            <td>Edits local repo files directly</td>
                             <td class="cell-opuspad">✅</td>
                             <td>✅</td>
                             <td>✅</td>
-                            <td>❌</td>
+                            <td>❌ Upload required</td>
                         </tr>
                         <tr>
-                            <td>Source mode for complex Markdown</td>
+                            <td>Distraction-free WYSIWYG reading</td>
                             <td class="cell-opuspad">✅</td>
-                            <td>❌</td>
+                            <td>❌ Split view noise</td>
                             <td>✅</td>
-                            <td>❌</td>
+                            <td>✅</td>
                         </tr>
                         <tr>
-                            <td>Auto-reloads on external changes</td>
+                            <td>Auto-reloads on agent file updates</td>
                             <td class="cell-opuspad">✅</td>
-                            <td>❌</td>
                             <td>✅</td>
+                            <td>⚠️ Varies</td>
                             <td>N/A</td>
                         </tr>
                         <tr>
-                            <td>Lightweight (no Electron)</td>
-                            <td class="cell-opuspad">✅</td>
-                            <td>✅</td>
-                            <td>❌ Electron</td>
+                            <td>Zero setup or plugins required</td>
+                            <td class="cell-opuspad">✅ Chrome extension</td>
+                            <td>❌ Plugin heavy</td>
+                            <td>❌ Overhead</td>
                             <td>✅</td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </section>
+
+        <section class="getting-started container section-spacing fade-in" id="how-to-use">
+            <div class="section-title">
+                <h2>How to use OpusPad</h2>
+                <p>Start reviewing and editing in three simple steps.</p>
+            </div>
+
+            <div class="features">
+                <div class="feature-card fade-in">
+                    <div style="background: var(--accent); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 24px;">1</div>
+                    <h3>Install the extension</h3>
+                    <p>Add OpusPad to Chrome from the Web Store. It's completely free and requires no background processes or sign-up.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div style="background: var(--accent); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 24px;">2</div>
+                    <h3>Launch the app</h3>
+                    <p>Click the OpusPad extension icon in your Chrome toolbar. A new tab will open with your local workspace environment.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div style="background: var(--accent); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 24px;">3</div>
+                    <h3>Select your folder</h3>
+                    <p>Click "Open Folder" on the sidebar and pick your local project directory. Chrome will ask for permission, and you're ready to read and edit your Markdown specs.</p>
+                </div>
             </div>
         </section>
 
@@ -904,35 +958,35 @@
             </div>
             
             <div class="faq-item">
-                <h3>Does OpusPad upload my files anywhere?</h3>
-                <p>Never. OpusPad is strictly local-first. It reads and writes directly to your local drive using Chrome's File System Access API. There is no server, no cloud sync, and no telemetry.</p>
+                <h3>What is spec-driven development?</h3>
+                <p>A workflow where humans write the architecture documents and requirements (specs), and AI agents write the code. The agent's progress is steered and verified against these text artifacts. This workflow requires keeping Markdown plans up-to-date and highly readable.</p>
             </div>
             
             <div class="faq-item">
-                <h3>Is this a note-taking app?</h3>
-                <p>No. We don't do wikis, backlinks, or graph views. OpusPad does one thing well: it makes local Markdown files fast to open, easy to read, and simple to edit.</p>
+                <h3>Why use OpusPad instead of VS Code for spec review?</h3>
+                <p>VS Code is an incredibly powerful IDE, but its native Markdown experience usually relies on noisy split-views and raw syntax tags. If you are reviewing a product requirement or agent strategy, OpusPad provides a cleaner, distraction-free WYSIWYG environment that feels like a real document editor.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Can I use it with Claude Code, Cursor, or other agents?</h3>
+                <p>Yes. OpusPad reads the same local files your agents interact with. When an agent modifies a plan or implementation note on disk, OpusPad detects the external change and refreshes your view instantly, keeping you perfectly in sync.</p>
             </div>
             
             <div class="faq-item">
-                <h3>Does it handle complex Markdown from Claude or Cursor?</h3>
-                <p>Yes. OpusPad handles tables, nested lists, code blocks, and more. If something is too complex for the WYSIWYG editor, the compatibility guard automatically falls back to source mode so nothing gets mangled.</p>
-            </div>
-            
-            <div class="faq-item">
-                <h3>Can I use it alongside other editors?</h3>
-                <p>Absolutely. When an external tool (or AI agent) modifies a file on disk, OpusPad detects the change and reloads the latest version automatically.</p>
+                <h3>Does it upload my specs or project files?</h3>
+                <p>Never. OpusPad is strictly local-first. It reads and writes directly to your local drive using Chrome's File System Access API. There is no server, no cloud sync, and no data collection. Your proprietary code and specs never leave your machine.</p>
             </div>
             
             <div class="faq-item">
                 <h3>Is it free?</h3>
-                <p>Yes. OpusPad is free and open source.</p>
+                <p>Yes. OpusPad is completely free and open source.</p>
             </div>
         </section>
 
         <section class="closing-cta fade-in">
             <div class="container">
-                <h2>Stop squinting at raw Markdown.</h2>
-                <p>Get the lightweight, local-first editor built for reviewing AI agent outputs.</p>
+                <h2>Stop reviewing specs as raw Markdown.</h2>
+                <p>Use the local-first editor built for spec-driven development.</p>
                 <a href="https://chromewebstore.google.com/detail/opuspad/ephlhjlnpnjjnjgdohdnbknadhklcoag" class="btn btn-primary" style="background: white; color: var(--dark-bg);">
                     Add to Chrome — It's Free
                 </a>

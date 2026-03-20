@@ -357,57 +357,49 @@ export default function App() {
     <div className="app-shell">
       {!rootHandle ? (
         <main className="landing-shell">
-          <section className="landing-panel">
-            <div className="landing-panel__hero">
-              <img src="/icon128.png" alt="OpusPad Logo" className="landing-panel__logo" />
-              <h1 className="landing-panel__title">OpusPad</h1>
-              <p className="landing-panel__subtitle">Bridging AI output and human intent, WYSIWYG, private, local only.</p>
+          <div className="landing-container">
+            <div className="landing-hero">
+              <div className="landing-logo-container">
+                <img src="/icon128.png" alt="OpusPad Logo" className="landing-logo" />
+              </div>
+              
+              <h2 className="landing-brand">OpusPad</h2>
+              <h1 className="landing-title">
+                Spec-Driven Development,<br />
+                Directly in Your Browser.
+              </h1>
+              
+              <button className="landing-button" onClick={mountWorkspace} type="button">
+                <span className="landing-button-text">{isMock ? 'Open Fixture Workspace' : 'Open Local Folder'}</span>
+                <svg className="landing-button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+              <p className="landing-action-hint">Select your project root to start editing local Markdown specs.</p>
+
+              {(error || permissionError) && (
+                <div className="landing-error">
+                  {error && <p>{error}</p>}
+                  {permissionError && <p>Permission denied to read the workspace.</p>}
+                </div>
+              )}
             </div>
             
-            <div className="landing-panel__features">
-              <div className="feature-item">
-                <span className="feature-item__icon">🔒</span>
-                <div className="feature-item__content">
-                  <h3>Local & Secure</h3>
-                  <p>Read and write directly to your file system. No cloud, no data collection.</p>
-                </div>
+            <hr className="landing-divider" />
+            
+            <div className="landing-features">
+              <div className="landing-feature-card">
+                <h3>Repo-Native Review</h3>
+                <p>Read and write directly to your local file system using the Chrome File System API.</p>
               </div>
-              <div className="feature-item">
-                <span className="feature-item__icon">✨</span>
-                <div className="feature-item__content">
-                  <h3>Markdown First</h3>
-                  <p>Highly optimized WYSIWYG experience tailored specifically for markdown files.</p>
-                </div>
+              <div className="landing-feature-card">
+                <h3>Spec & Source Modes</h3>
+                <p>Seamlessly toggle between distraction-free reading and precise raw Markdown editing.</p>
               </div>
-              <div className="feature-item">
-                <span className="feature-item__icon">🌗</span>
-                <div className="feature-item__content">
-                  <h3>Dual Mode</h3>
-                  <p>Seamlessly switch between rich visual editing and precise source mode.</p>
-                </div>
-              </div>
-              <div className="feature-item">
-                <span className="feature-item__icon">🎨</span>
-                <div className="feature-item__content">
-                  <h3>Syntax Highlights</h3>
-                  <p>Full support and highlighting for various code blocks and other text files.</p>
-                </div>
+              <div className="landing-feature-card">
+                <h3>Agent Sync</h3>
+                <p>Auto-reloads when external agents update implementation plans on disk.</p>
               </div>
             </div>
-
-            <div className="landing-panel__action">
-              <button className="primary-button landing-panel__button" onClick={mountWorkspace} type="button">
-                {isMock ? 'Open Fixture Workspace' : 'Open Folder'}
-              </button>
-            </div>
-
-            {(error || permissionError) && (
-              <div className="landing-panel__error">
-                {error && <p>{error}</p>}
-                {permissionError && <p>Permission denied to read the workspace.</p>}
-              </div>
-            )}
-          </section>
+          </div>
         </main>
       ) : (
         <div

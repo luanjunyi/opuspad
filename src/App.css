@@ -70,103 +70,166 @@ button {
   box-shadow: var(--shadow);
 }
 
-.landing-panel {
-  max-width: 800px;
-  padding: 64px 72px;
-  border-radius: 32px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.07), 0 4px 12px rgba(0, 0, 0, 0.03);
-  backdrop-filter: blur(24px);
-}
-
-.landing-panel__hero {
-  text-align: center;
-  margin-bottom: 56px;
-}
-
-.landing-panel__logo {
-  width: 96px;
-  height: 96px;
-  margin-bottom: 32px;
-  border-radius: 20px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
-}
-
-.landing-panel__title {
-  font-family: "Instrument Serif", serif;
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  margin: 0 0 16px;
-  font-size: clamp(3rem, 6vw, 4.5rem);
-  line-height: 1.05;
-  color: var(--ink);
-}
-
-.landing-panel__subtitle {
-  font-size: 1.15rem;
-  color: var(--muted);
-  line-height: 1.5;
-  max-width: 480px;
-  margin: 0 auto;
-}
-
-.landing-panel__features {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 32px;
-  margin-bottom: 56px;
-}
-
-.feature-item {
+.landing-container {
+  max-width: 840px;
+  width: 100%;
+  padding: 40px 20px;
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
-.feature-item__icon {
-  font-size: 1.5rem;
-  background: var(--bg);
+.landing-hero {
+  margin-bottom: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.landing-logo-container {
+  background: var(--panel-strong);
   border: 1px solid var(--line);
-  width: 48px;
-  height: 48px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 16px;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 32px;
 }
 
-.feature-item__content h3 {
-  margin: 0 0 6px;
-  font-size: 1.05rem;
-  font-weight: 600;
+.landing-logo {
+  width: 44px;
+  height: 44px;
+  transform: rotate(-3deg);
+  transition: transform 0.4s ease;
+}
+
+.landing-logo:hover {
+  transform: rotate(0deg) scale(1.05);
+}
+
+.landing-brand {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-size: 2.25rem;
+  margin: 0 0 12px;
   color: var(--ink);
+  letter-spacing: -0.02em;
 }
 
-.feature-item__content p {
+.landing-title {
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 1.6rem;
+  line-height: 1.3;
+  margin: 0 0 40px;
+  color: var(--muted);
+  letter-spacing: -0.01em;
+}
+
+.landing-button {
+  background: var(--ink);
+  color: #f7f4ef;
+  border: none;
+  font-family: inherit;
+  border-radius: 999px;
+  padding: 14px 20px 14px 32px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(31, 29, 27, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  letter-spacing: -0.01em;
+}
+
+.landing-button:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 16px 48px rgba(31, 29, 27, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  background: #0a0a09;
+}
+
+.landing-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 16px rgba(31, 29, 27, 0.2);
+}
+
+.landing-button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  transition: transform 0.3s ease, background-color 0.3s;
+}
+
+.landing-button:hover .landing-button-icon {
+  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.landing-action-hint {
+  margin: 20px 0 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.landing-divider {
+  border: none;
+  border-top: 1px solid var(--line);
+  width: 100%;
+  margin: 0 0 48px;
+}
+
+.landing-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  width: 100%;
+}
+
+.landing-feature-card {
+  text-align: left;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 28px 24px;
+}
+
+.landing-feature-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+
+.landing-feature-card p {
   margin: 0;
   font-size: 0.95rem;
   color: var(--muted);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-.landing-panel__action {
-  text-align: center;
-}
-
-.landing-panel__button {
-  padding: 16px 36px;
-  font-size: 1.1rem;
-  border-radius: 999px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease;
-}
-
-.landing-panel__button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+@media (max-width: 768px) {
+  .landing-container {
+    padding: 32px 20px;
+  }
+  
+  .landing-features {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
 .empty-state h2,
@@ -176,14 +239,7 @@ button {
   letter-spacing: -0.03em;
 }
 
-.landing-panel h1 {
-  margin: 0 0 18px;
-  font-size: clamp(2.8rem, 7vw, 5.2rem);
-  line-height: 0.92;
-  max-width: 10ch;
-}
-
-.landing-panel__eyebrow,
+.landing-eyebrow,
 .editor-panel__eyebrow,
 .empty-state__eyebrow,
 .sidebar-shell__eyebrow,
@@ -197,7 +253,7 @@ button {
   color: var(--muted);
 }
 
-.landing-panel__copy,
+.landing-copy,
 .empty-state p,
 .editor-warning__text,
 .unsupported-file p {
@@ -236,7 +292,7 @@ button {
   color: var(--ink);
 }
 
-.landing-panel__error,
+.landing-error,
 .unsupported-file {
   margin-top: 20px;
   border-radius: 20px;
@@ -852,12 +908,12 @@ button {
     align-items: flex-start;
   }
 
-  .landing-panel {
+  .landing-container {
     padding: 32px 24px;
     border-radius: 24px;
   }
 
-  .landing-panel__features {
+  .landing-features {
     grid-template-columns: 1fr;
     gap: 24px;
   }

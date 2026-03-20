@@ -7,63 +7,63 @@ OpusPad
 
 ### Short Description (max 132 characters)
 ```
-Review and edit local Markdown files in Chrome. WYSIWYG + source mode. 100% private, zero uploads. Built for AI coding workflows.
+The local editor for spec-driven development. Review plans, steer AI agents, and edit Markdown specs in Chrome. 100% private.
 ```
 
 ### Full Description
 ```
-If you use AI coding agents like Claude Code or Cursor, you constantly deal with generated Markdown: CLAUDE.md, implementation plans, architecture notes, and specs.
+HOW TO USE: Open OpusPad by clicking its icon in your browser toolbar, then click 'Open Folder' to select your project directory and start editing.
 
-Opening these raw files in the browser is an unreadable mess. Opening them in a heavy desktop app just for a quick review is overkill.
+In AI-assisted development, specs are no longer optional notes—they are working artifacts. Agents read specs, generate plans, update task lists, and write implementation notes. Spec-driven development only works if those files stay readable and editable.
 
-OpusPad is the sweet spot. A lightweight Chrome extension that opens your local Markdown files and renders them beautifully.
+Agents can draft the code, but humans still need to inspect, refine, and trust the artifact. OpusPad sits in the sweet spot for this review loop: it’s a browser-native, local-first editor purpose-built for reading and editing the Markdown files already in your repository. 
 
 KEY FEATURES:
 
-• WYSIWYG Editor — Tables, code blocks, and lists render cleanly. Edit text naturally without worrying about Markdown syntax.
+• WYSIWYG Editor — Review specs and generated plans without the overhead of raw Markdown noise. Tables, code blocks, and lists render cleanly.
 
-• Source Mode — Toggle to raw Markdown with full syntax highlighting for precision edits. A compatibility guard automatically falls back to source mode for complex syntax.
+• Source Mode — Drop down to raw Markdown for precise edits when structure and document formatting matter.
 
-• Directory Sidebar — Browse your project's file tree. Smart fuzzy search lets you jump to any file instantly.
+• External Change Detection — When an AI agent updates your project tracker or CLAUDE.md on disk, OpusPad detects the change and reloads instantly to keep you in sync.
 
-• Auto Save — Your edits persist to disk automatically. No manual save required.
+• Local File Access — Work directly with your repo artifacts. Read and write directly using Chrome's native File System API.
 
-• External Change Detection — When an AI agent updates a file on disk, OpusPad detects it and reloads automatically.
+• Auto Save — Your edits persist to disk automatically. Refine a spec and your agent immediately sees the updated file.
 
-• File Management — Create new Markdown files and delete old ones directly from the sidebar.
+• Directory Sidebar — Browse your project's spec folders. Smart fuzzy search lets you jump between design docs and implementation notes instantly.
 
-• 100% Local & Private — Your files never leave your machine. Zero telemetry, zero cloud sync, zero data collection.
+• 100% Local & Private — Your sensitive specs and proprietary code never leave your machine. Zero telemetry, zero cloud sync, zero data collection.
 
-• Lightweight — No Electron overhead. Runs natively inside Chrome. Opens instantly.
+• Lightweight — Optimized for quick review loops, not general note-taking fluff. Runs natively inside Chrome without Electron overhead.
 
 PERFECT FOR:
-- Reviewing CLAUDE.md and agent rulesets
-- Editing architecture plans and specs
-- Quick README updates
-- Refining any AI-generated documentation
+- Writing and refining architecture specs
+- Reviewing agent-generated plans and task files
+- Editing implementation notes and CLAUDE.md rulesets seamlessly
+- Keeping everything strictly local and repo-native
 
 OpusPad is free and open source.
 ```
 
 ### 5 Bullet-Point Benefit Summaries
 ```
-1. Instant Rendering — View local Markdown files beautifully in Chrome without opening a heavy application.
-2. 100% Local & Private — Reads and writes directly to your disk. Zero cloud uploads or tracking.
-3. Dual Editing Modes — Toggle between clean WYSIWYG editing and raw Markdown source mode instantly.
-4. Built for AI Workflows — The fastest way to review CLAUDE.md, architecture specs, and generated plans.
-5. Zero Bloat — Not a wiki, not a cloud app. A fast, simple tool to read and edit Markdown files locally.
+1. Spec-Driven Review Loop — The fastest way to review CLAUDE.md, architecture specs, and generated implementation plans.
+2. 100% Repo-Native & Private — Reads and writes directly to your local project disk. Zero cloud uploads or telemetry.
+3. Agent Sync Integration — Instantly auto-reloads files when Claude Code or Cursor modifies your specs locally.
+4. Dual Editing Modes — Toggle between distraction-free WYSIWYG reading and raw Markdown source mode instantly.
+5. Zero Bloat — Optimized strictly for validating agent-written Markdown, not general knowledge-graph note-taking.
 ```
 
 ### 10 Taglines
 ```
-1. Markdown made readable.
-2. The local Markdown editor for Chrome.
-3. Review AI specs at browser speed.
-4. Your agent writes it. You read it clearly.
-5. Local, private, instant Markdown.
-6. Stop reading raw tags.
-7. WYSIWYG Markdown, right in your browser.
-8. Fast, local Markdown editing without the bloat.
+1. The editor for spec-driven development.
+2. Agents draft. Humans refine.
+3. Stop reviewing specs as raw Markdown.
+4. The local Markdown editor for agent workflows.
+5. Review AI specs at browser speed.
+6. Write specs. Steer agents. Verify outcomes.
+7. Your repo-native spec editor.
+8. Fast, private Markdown editing without the bloat.
 9. Tame your AI's Markdown output.
-10. The missing Markdown viewer for Chrome.
+10. The browser-native sandbox for your specs.
 ```
