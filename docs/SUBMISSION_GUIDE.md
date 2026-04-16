@@ -4,23 +4,34 @@ This guide outlines the steps required to publish the Markdown Editor extension 
 
 ## 1. Prepare the Extension for Production
 
-Before submitting, you need to create a production-ready `.zip` file of the extension.
+Before submitting, you need to bump the version, build the extension, and create a production-ready `.zip` file of the extension. Follow this exact flow:
 
-1. **Clean and Build:** Ensure you have a fresh, error-free build.
+1. **Check Current Version:** Find out what the current release version is.
+```bash
+npm run release query
+```
 
+2. **Bump the Version:** Update the version strings (e.g., to `1.3.1`) across all manifest and package files.
+```bash
+npm run release bump 1.3.1
+```
+
+3. **Commit the Bump:** Commit the version changes to git.
+```bash
+git commit -am "chore: release v1.3.1"
+```
+
+4. **Build the Extension:** Generate the `dist` folder natively.
 ```bash
 npm run build
 ```
 
-1. **Zip the Output:** Compress the contents of the `dist` directory (not the `dist` folder itself, but the files *inside* it).
-
+5. **Pack the Zip:** Compress the built outputs into a release zip file.
 ```bash
-cd dist
-zip -r ../markdown-editor-extension.zip *
-cd ..
+npm run release pack
 ```
 
-*You will upload&#x20;*`markdown-editor-extension.zip`*&#x20;to the developer dashboard.*
+*You will upload the resulting zip file (`opuspad_chrome-v1.3.1.zip`) to the developer dashboard.*
 
 ## 2. Prepare Store Listing Assets
 

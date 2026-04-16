@@ -7,18 +7,22 @@ OpusPad
 
 ### Short Description (max 132 characters)
 ```
-The local editor for spec-driven development. Review plans, steer AI agents, and edit Markdown specs in Chrome. 100% private.
+The local editor for spec-driven development. Instant WYSIWYG scratchpad, local folder editing, and 100% private.
 ```
 
 ### Full Description
 ```
-HOW TO USE: Open OpusPad by clicking its icon in your browser toolbar, then click 'Open Folder' to select your project directory and start editing.
+HOW TO USE:
+1. Open OpusPad: Launch the extension to start writing immediately in the Standalone Scratchpad.
+2. Open Folder: Click 'Open Folder' on the sidebar to select your project directory for full workspace editing.
 
 In AI-assisted development, specs are no longer optional notes—they are working artifacts. Agents read specs, generate plans, update task lists, and write implementation notes. Spec-driven development only works if those files stay readable and editable.
 
 Agents can draft the code, but humans still need to inspect, refine, and trust the artifact. OpusPad sits in the sweet spot for this review loop: it’s a browser-native, local-first editor purpose-built for reading and editing the Markdown files already in your repository. 
 
 KEY FEATURES:
+
+• Standalone Scratchpad — Zero setup note-taking. Start writing instantly in a persistent local scratchpad without granting folder permissions.
 
 • WYSIWYG Editor — Review specs and generated plans without the overhead of raw Markdown noise. Tables, code blocks, and lists render cleanly.
 
@@ -34,9 +38,8 @@ KEY FEATURES:
 
 • 100% Local & Private — Your sensitive specs and proprietary code never leave your machine. Zero telemetry, zero cloud sync, zero data collection.
 
-• Lightweight — Optimized for quick review loops, not general note-taking fluff. Runs natively inside Chrome without Electron overhead.
-
 PERFECT FOR:
+- Instant, private note-taking in the browser
 - Writing and refining architecture specs
 - Reviewing agent-generated plans and task files
 - Editing implementation notes and CLAUDE.md rulesets seamlessly
@@ -56,9 +59,9 @@ OpusPad is free and open source.
 
 ### 10 Taglines
 ```
-1. The editor for spec-driven development.
+1. Instant scratchpad. Local spec editor.
 2. Agents draft. Humans refine.
-3. Stop reviewing specs as raw Markdown.
+3. Zero-setup Markdown note-taking.
 4. The local Markdown editor for agent workflows.
 5. Review AI specs at browser speed.
 6. Write specs. Steer agents. Verify outcomes.

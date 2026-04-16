@@ -24,41 +24,42 @@ async function capture(page, name, options = {}) {
   const page = await context.newPage();
   
   try {
-    // 1. Landing Page
-    console.log('Navigating to landing page...');
-    await page.goto('http://127.0.0.1:5173/?fs=mock');
-    await page.waitForSelector('.landing-panel');
-    await capture(page, 'screenshot_1_landing.png');
+    // 1. Initial Scratchpad
+    console.log('Navigating to scratchpad...');
+    await page.goto('http://127.0.0.1:5173/');
+    await page.waitForSelector('.scratchpad-shell');
+    await capture(page, 'screenshot_1_scratchpad.png');
 
-    // 2. Open Workspace
-    console.log('Opening workspace...');
-    await page.click('button.primary-button');
+    // 2. Scratchpad with multiple notes
+    console.log('Creating second note...');
+    await page.click('button[title="New Note"]');
+    await page.waitForTimeout(1000);
+    // Type some content in the second note
+    await page.click('.bn-editor');
+    await page.keyboard.type('# Research Ideas\n- Agentic workflows\n- Local-first UX\n- Chrome Extension API limits');
+    await page.waitForTimeout(1000);
+    await capture(page, 'screenshot_2_multi_note.png');
+
+    // 3. Open Workspace via ?fs=mock
+    console.log('Opening workspace mock...');
+    await page.goto('http://127.0.0.1:5173/?fs=mock');
+    await page.waitForSelector('.scratchpad-shell');
+    await page.click('button:has-text("Open Folder")');
     console.log('Waiting for filesystem tree...');
     await page.waitForSelector('text=example.md', { timeout: 10000 });
+    await capture(page, 'screenshot_3_workspace.png');
     
-    // 3. Open example.md (Rich Mode)
+    // 4. Open example.md (Rich Mode)
     console.log('Opening example.md...');
     await page.click('text=example.md');
-    await page.waitForTimeout(3000); // Wait for BlockNote to initialize
-    await capture(page, 'screenshot_2_rich_mode.png');
-
-    // 4. Switch to Source Mode (using design-doc which should fail guard due to tables)
-    console.log('Opening design-doc-md-editor-chrome.md...');
-    await page.click('text=design-doc-md-editor-chrome.md');
     await page.waitForTimeout(2000);
-    await capture(page, 'screenshot_3_source_mode.png');
+    await capture(page, 'screenshot_4_rich_mode.png');
 
-    // 5. Open JSON file (CodeMirror)
-    console.log('Opening package.json...');
-    await page.click('text=package.json');
-    await page.waitForTimeout(1500);
-    await capture(page, 'screenshot_4_json_editor.png');
-
-    // 6. Project Manifest
-    console.log('Opening manifest.json...');
-    await page.click('text=manifest.json');
-    await page.waitForTimeout(1500);
-    await capture(page, 'screenshot_5_manifest_editor.png');
+    // 5. Open CLAUDE.md (Source Mode)
+    console.log('Opening submission guide...');
+    await page.click('text=SUBMISSION_GUIDE.md');
+    await page.waitForTimeout(2000);
+    await capture(page, 'screenshot_5_source_mode.png');
 
     console.log('All screenshots captured successfully!');
   } catch (error) {
