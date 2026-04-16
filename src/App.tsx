@@ -3,6 +3,7 @@ import { getFileSystemService } from './services';
 import { FileNode, ActiveFile } from './types';
 import { Sidebar } from './components/Sidebar';
 import { EditorRouter } from './components/EditorRouter';
+import { ScratchpadShell } from './components/ScratchpadShell';
 import { applySavedTextFileState } from './utils/activeFileSave';
 
 const DEFAULT_SIDEBAR_WIDTH = 300;
@@ -356,51 +357,7 @@ export default function App() {
   return (
     <div className="app-shell">
       {!rootHandle ? (
-        <main className="landing-shell">
-          <div className="landing-container">
-            <div className="landing-hero">
-              <div className="landing-logo-container">
-                <img src="/icon128.png" alt="OpusPad Logo" className="landing-logo" />
-              </div>
-              
-              <h2 className="landing-brand">OpusPad</h2>
-              <h1 className="landing-title">
-                Spec-Driven Development,<br />
-                Directly in Your Browser.
-              </h1>
-              
-              <button className="landing-button" onClick={mountWorkspace} type="button">
-                <span className="landing-button-text">{isMock ? 'Open Fixture Workspace' : 'Open Local Folder'}</span>
-                <svg className="landing-button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </button>
-              <p className="landing-action-hint">Select your project root to start editing local Markdown specs.</p>
-
-              {(error || permissionError) && (
-                <div className="landing-error">
-                  {error && <p>{error}</p>}
-                  {permissionError && <p>Permission denied to read the workspace.</p>}
-                </div>
-              )}
-            </div>
-            
-            <hr className="landing-divider" />
-            
-            <div className="landing-features">
-              <div className="landing-feature-card">
-                <h3>Repo-Native Review</h3>
-                <p>Read and write directly to your local file system using the Chrome File System API.</p>
-              </div>
-              <div className="landing-feature-card">
-                <h3>Spec & Source Modes</h3>
-                <p>Seamlessly toggle between distraction-free reading and precise raw Markdown editing.</p>
-              </div>
-              <div className="landing-feature-card">
-                <h3>Agent Sync</h3>
-                <p>Auto-reloads when external agents update implementation plans on disk.</p>
-              </div>
-            </div>
-          </div>
-        </main>
+        <ScratchpadShell onOpenWorkspace={mountWorkspace} />
       ) : (
         <div
           className="workspace-shell"

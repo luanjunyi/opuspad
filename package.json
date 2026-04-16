@@ -1,6 +1,6 @@
 {
   "name": "opuspad_chrome",
-  "version": "1.2.1",
+  "version": "1.3",
   "description": "OpusPad: Bridging AI output and human intent, WYSIWYG, private, local only.",
   "main": "index.js",
   "scripts": {

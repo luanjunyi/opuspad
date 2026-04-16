@@ -126,11 +126,7 @@ export function MarkdownEditor({
         editor={editor}
         emojiPicker={false}
         filePanel={false}
-        formattingToolbar={false}
-        linkToolbar={false}
         onChange={handleChange}
-        sideMenu={false}
-        slashMenu={false}
         tableHandles={false}
       />
     </div>
