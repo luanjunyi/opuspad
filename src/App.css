@@ -1149,6 +1149,9 @@ button {
   padding: 22px 48px 16px;
   border-bottom: 1px solid var(--line);
   background: linear-gradient(180deg, rgba(255,255,255,0.52), rgba(255,255,255,0.2));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .scratchpad-editor-header h1 {

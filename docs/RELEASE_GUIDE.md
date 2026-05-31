@@ -1,74 +1,118 @@
 # Release Guide
 
-This document outlines the steps to build, package, and release new versions of OpusPad Chrome Extension. 
+This document outlines the steps to build, package, and release new versions of the OpusPad Chrome Extension.
 
-We use a local release script to bump versions and generate the package, combined with an automated GitHub Actions workflow that creates a GitHub Release whenever a new version tag (`v*`) is pushed to the repository.
+The release pipeline has two parts:
 
-## 1. Prepare the Release
+1. **Local release script** (`scripts/release.mjs`) — bumps version numbers, packs the zip
+2. **GitHub Actions workflow** (`.github/workflows/release.yml`) — automated CI that builds and publishes a GitHub Release on every `v*` tag push
 
-When you are ready to make a release, use the included release script. This script will automatically bump the version numbers in `package.json`, `manifest.json`, and update the version badge on the documentation site (`docs/index.html`). It will also create a local zip file for your convenience.
+---
+
+## Release Script Commands
+
+The local release script, invoked via `npm run release`, has three subcommands:
+
+| Command | Usage | Behavior |
+|---------|-------|----------|
+| `query` | `npm run release query` | Prints the current version (from `package.json`) |
+| `bump` | `npm run release bump 1.4.0` | Writes the new version to `package.json`, `manifest.json`, and `docs/index.html` |
+| `pack` | `npm run release pack` | Zips `dist/` into `opuspad_chrome-v{version}.zip` |
+
+---
+
+## Full Release Workflow
+
+### 1. Check the current version
 
 ```bash
-npm run release <new_version>
+npm run release query
 ```
-*Example: `npm run release 1.3`*
 
-## 2. Commit the Changes
+### 2. Bump the version
 
-Commit the version bump changes to your local git repository.
+```bash
+npm run release bump <new_version>
+```
+
+Example: `npm run release bump 1.4.0`
+
+This updates the version in three files:
+- `package.json`
+- `manifest.json`
+- `docs/index.html` (version badge)
+
+### 3. Commit the version bump
 
 ```bash
 git add package.json manifest.json docs/index.html
 git commit -m "chore: bump version to <new_version>"
 ```
 
-## 3. Tag the Release
+Or, if those are the only changes:
 
-Create a git tag for the new version. The tag **must** start with a `v` to trigger the automated GitHub Action.
+```bash
+git commit -am "chore: bump version to <new_version>"
+```
+
+### 4. Build the extension
+
+```bash
+npm run build
+```
+
+This runs `tsc && vite build`, producing the unpacked extension in `dist/`.
+
+### 5. (Optional) Create a local zip
+
+```bash
+npm run release pack
+```
+
+Produces `opuspad_chrome-v{version}.zip` in the repo root. Useful for manual Chrome Web Store uploads.
+
+### 6. Tag the release
+
+The tag **must** start with `v` to trigger the GitHub Actions workflow.
 
 ```bash
 git tag v<new_version>
 ```
-*Example: `git tag v1.3`*
 
-## 4. Push to GitHub
+Example: `git tag v1.4.0`
 
-Push your commit and the new tag to GitHub.
+### 7. Push to GitHub
 
 ```bash
-git push && git push origin v<new_version>
+git push origin main
+git push origin v<new_version>
 ```
 
-Once pushed, the GitHub Action will automatically:
-1. Build the extension.
-2. Create a zip artifact (`opuspad_chrome-v<new_version>.zip`).
-3. Publish a new GitHub Release with the zip file attached.
+Once the tag is pushed, the GitHub Actions workflow automatically:
+1. Checks out the code at the tag
+2. Installs dependencies (`npm ci`)
+3. Builds the extension (`npm run build`)
+4. Zips `dist/` into `opuspad_chrome-v{version}.zip`
+5. Publishes a GitHub Release with the zip attached and auto-generated release notes
 
 ---
 
 ## Updating an Existing Release (Force Method)
 
-If you find an issue with a release and need to update the published zip file without bumping the version number, you can forcefully update the git tag. 
+If you find an issue and need to update the published zip without bumping the version, you can force-push the tag. The CI workflow allows updates (`allowUpdates: true`) and will replace the artifact on the existing GitHub Release.
 
-The GitHub Action is configured to allow updates and will seamlessly overwrite the existing artifact on the GitHub Release.
-
-**1. Make your code changes and commit them.**
-
-**2. Force update the tag locally to point to your new commit:**
-```bash
-git tag -f v<version>
-```
-*Example: `git tag -f v1.3`*
-
-**3. Force push the tag to GitHub:**
-```bash
-git push -f origin v<version>
-```
-
-The GitHub Action will trigger again, build the new code, and replace the artifact on the existing release.
+1. Make your code changes and commit them.
+2. Force-update the tag locally:
+   ```bash
+   git tag -f v<version>
+   ```
+3. Force-push the tag:
+   ```bash
+   git push -f origin v<version>
+   ```
 
 ---
 
-## Chrome Web Store
+## Chrome Web Store Upload
 
-Once the release is ready and the zip file is generated (either locally by the release script or via the GitHub Actions release artifact), you can upload the zip file to the Chrome Web Store Developer Dashboard to publish the update to users. See `SUBMISSION_GUIDE.md` for more details.
+Once the zip is generated (either locally via `npm run release pack` or downloaded from the GitHub Release), upload it to the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole/). See `docs/SUBMISSION_GUIDE.md` for the full store submission checklist (assets, descriptions, privacy declarations, etc.).

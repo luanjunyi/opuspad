@@ -4,6 +4,7 @@ import {
   getLastOpenedScratchpadId, setLastOpenedScratchpadId, ScratchpadNote 
 } from '../services/scratchpad';
 import { MarkdownEditor } from './MarkdownEditor';
+import { TextEditor } from './TextEditor';
 import { ActiveFile } from '../types';
 
 interface ScratchpadShellProps {
@@ -14,6 +15,7 @@ export function ScratchpadShell({ onOpenWorkspace }: ScratchpadShellProps) {
   const [notes, setNotes] = useState<ScratchpadNote[]>([]);
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editorMode, setEditorMode] = useState<'markdown' | 'text'>('markdown');
 
   useEffect(() => {
     let localNotes = getScratchpadNotes();
@@ -102,9 +104,9 @@ export function ScratchpadShell({ onOpenWorkspace }: ScratchpadShellProps) {
       kind: 'text' as const,
       path: activeNote.id,
       content: activeNote.content,
-      editor: 'markdown' as const,
-      canOpenInRichMode: true,
-      canOpenInSourceMode: false,
+      editor: editorMode,
+      canOpenInRichMode: editorMode === 'text',
+      canOpenInSourceMode: editorMode === 'markdown',
     }
   } : null;
 
@@ -172,14 +174,34 @@ export function ScratchpadShell({ onOpenWorkspace }: ScratchpadShellProps) {
           <div className="scratchpad-editor-panel">
             <header className="scratchpad-editor-header">
               <h1>{activeNote?.title}</h1>
+              <div className="scratchpad-editor-header-actions">
+                {editorMode === 'markdown' ? (
+                  <button className="ghost-button" onClick={() => setEditorMode('text')} type="button">
+                    Open source
+                  </button>
+                ) : (
+                  <button className="ghost-button" onClick={() => setEditorMode('markdown')} type="button">
+                    Open rich
+                  </button>
+                )}
+              </div>
             </header>
             <div className="scratchpad-editor-body">
-              <MarkdownEditor
-                activeFile={fakeActiveFile}
-                onSave={handleSave}
-                onDirty={() => {}}
-                reloadNonce={0}
-              />
+              {editorMode === 'markdown' ? (
+                <MarkdownEditor
+                  activeFile={fakeActiveFile}
+                  onSave={handleSave}
+                  onDirty={() => {}}
+                  reloadNonce={0}
+                />
+              ) : (
+                <TextEditor
+                  activeFile={fakeActiveFile}
+                  onSave={handleSave}
+                  onDirty={() => {}}
+                  reloadNonce={0}
+                />
+              )}
             </div>
           </div>
         ) : (
